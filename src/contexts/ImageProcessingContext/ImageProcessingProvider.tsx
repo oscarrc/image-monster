@@ -35,7 +35,7 @@ const DEFAULT_OPTIONS: ProcessingOptions = {
     styleStrength: 0.5,
     numInferenceSteps: 20,
     guidanceScale: 7.5,
-    style: "Ghibli",
+    style: "ghibli.png",
   },
 };
 

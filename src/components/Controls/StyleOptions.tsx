@@ -1,6 +1,17 @@
 import { MODES, type StyleOptions } from "@/types/imageProcessing";
 import { useImageProcessing } from "@/contexts/ImageProcessingContext/useImageProcessing";
 
+const AVAILABLE_STYLES = [
+  {
+    name: "Ghibli",
+    value: "ghibli.png",
+  },
+  {
+    name: "Dragon Ball",
+    value: "dragon-ball.png",
+  },
+] as const;
+
 const StyleOptions = () => {
   const { options, updateOptions } = useImageProcessing();
 
@@ -45,13 +56,11 @@ const StyleOptions = () => {
           value={options.style.style}
           className="select select-primary select-sm w-full"
         >
-          <option value="ghibli">Ghibli</option>
-          <option value="anime">Anime</option>
-          <option value="realistic">Realistic</option>
-          <option value="cartoon">Cartoon</option>
-          <option value="oil_painting">Oil Painting</option>
-          <option value="watercolor">Watercolor</option>
-          <option value="sketch">Sketch</option>
+          {AVAILABLE_STYLES.map((style) => (
+            <option key={style.value} value={style.value}>
+              {style.name}
+            </option>
+          ))}
         </select>
       </div>
       <div className="form-control">
@@ -104,6 +113,18 @@ const StyleOptions = () => {
           onChange={handleGuidanceScaleChange}
           className="range range-primary range-xs w-full"
         />
+      </div>
+      <div className="mt-4">
+        <label className="label">
+          <span className="label-text">Style Reference</span>
+        </label>
+        <div className="relative w-full rounded-lg overflow-hidden bg-base-300">
+          <img
+            src={`/styles/${options.style.style}`}
+            alt="Style preview"
+            className="object-contain "
+          />
+        </div>
       </div>
     </div>
   );

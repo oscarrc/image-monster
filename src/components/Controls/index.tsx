@@ -1,12 +1,12 @@
 import { FiArrowLeft, FiInfo } from "react-icons/fi";
 
+import BackgroundOptions from "./BackgroundOptions";
+import EnhanceOptions from "./EnhanceOptions";
 import { MODES } from "@/types/imageProcessing";
+import StyleOptions from "./StyleOptions";
 import { motion } from "framer-motion";
 import { useImageProcessing } from "@/contexts/ImageProcessingContext/useImageProcessing";
 import { useNavigate } from "react-router-dom";
-import BackgroundOptions from "./BackgroundOptions";
-import EnhanceOptions from "./EnhanceOptions";
-import StyleOptions from "./StyleOptions";
 
 const ModeInfo = {
   [MODES.BACKGROUND]: {
@@ -24,7 +24,10 @@ const ModeInfo = {
     info: "This will apply an artistic style (Ghibli) to your image.",
     options: StyleOptions,
   },
-} as Record<string, { label: string; info: string; options: React.ComponentType }>;
+} as Record<
+  string,
+  { label: string; info: string; options: React.ComponentType }
+>;
 
 const Controls = () => {
   const {
@@ -65,49 +68,59 @@ const Controls = () => {
       transition={{ duration: 0.3 }}
       className="w-full h-full flex flex-col"
     >
-      <div className="bg-base-200 rounded-lg p-4 flex flex-col h-full w-full gap-4">
-        <div className="flex items-center gap-4">
-          <button onClick={handleBack} className="btn btn-circle btn-ghost">
-            <FiArrowLeft className="w-4 h-4" />
-          </button>
-          <h3 className="text-lg font-semibold">Choose Processing Option</h3>
-        </div>
-        <div className="tabs tabs-border">
-          {Object.keys(ModeInfo).map((key) => (
-            <button
-              key={key}
-              className={`tab flex-1 ${mode === key ? "tab-active" : ""}`}
-              onClick={() => setMode(key as MODES)}
-            >
-              {ModeInfo[key].label}
+      <div className="bg-base-200 rounded-lg p-4 flex flex-col h-full w-full">
+        {/* Fixed Header */}
+        <div className="flex-none">
+          <div className="flex items-center gap-4 mb-4">
+            <button onClick={handleBack} className="btn btn-circle btn-ghost">
+              <FiArrowLeft className="w-4 h-4" />
             </button>
-          ))}
+            <h3 className="text-lg font-semibold">Choose Processing Option</h3>
+          </div>
+          <div className="tabs tabs-border mb-4">
+            {Object.keys(ModeInfo).map((key) => (
+              <button
+                key={key}
+                className={`tab flex-1 ${mode === key ? "tab-active" : ""}`}
+                onClick={() => setMode(key as MODES)}
+              >
+                {ModeInfo[key].label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="space-y-4 flex flex-col flex-1">
+        {/* Scrollable Controls */}
+        <div className="flex-1 overflow-y-auto px-4">
           <OptionsComponent />
-          <div className="alert border border-primary text-primary mt-auto">
+        </div>
+
+        {/* Fixed Footer */}
+        <div className="flex-none mt-4">
+          <div className="alert border border-primary text-primary mb-4">
             <FiInfo className="w-5 h-5" />
             <span>{ModeInfo[mode].info}</span>
           </div>
+          {!processedImage ? (
+            <button
+              className="btn btn-primary btn-block"
+              disabled={isProcessing}
+              onClick={handleProcessing}
+            >
+              {isProcessing && (
+                <span className="loading loading-spinner"></span>
+              )}
+              {isProcessing ? "Processing..." : "Process Image"}
+            </button>
+          ) : (
+            <button
+              className="btn btn-outline btn-block btn-primary"
+              onClick={() => setProcessedImage(null)}
+            >
+              Try Another Effect
+            </button>
+          )}
         </div>
-        {!processedImage ? (
-          <button
-            className="btn btn-primary btn-block"
-            disabled={isProcessing}
-            onClick={handleProcessing}
-          >
-            {isProcessing && <span className="loading loading-spinner"></span>}
-            {isProcessing ? "Processing..." : "Process Image"}
-          </button>
-        ) : (
-          <button
-            className="btn btn-outline btn-block btn-primary"
-            onClick={() => setProcessedImage(null)}
-          >
-            Try Another Effect
-          </button>
-        )}
       </div>
     </motion.div>
   );
