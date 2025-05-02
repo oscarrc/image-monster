@@ -2,10 +2,10 @@ import Controls from "@/components/Controls";
 import ImagePreview from "@/components/ImagePreview";
 import ResultDiffPreview from "@/components/ResultPreview";
 import { motion } from "framer-motion";
-import { useImageContext } from "@/contexts/ImageContext/useImageContext";
+import { useImageProcessing } from "@/contexts/ImageProcessingContext/useImageProcessing";
 
 const ProcessView = () => {
-  const { processedImage } = useImageContext();
+  const { processedImage } = useImageProcessing();
 
   return (
     <motion.div

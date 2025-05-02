@@ -2,12 +2,12 @@ import { useRef, useState } from "react";
 
 import { FiUploadCloud } from "react-icons/fi";
 import { motion } from "framer-motion";
-import { useImageContext } from "@/contexts/ImageContext/useImageContext";
+import { useImageProcessing } from "@/contexts/ImageProcessingContext/useImageProcessing";
 import { useNavigate } from "react-router-dom";
 
 const Uploader = () => {
   const navigate = useNavigate();
-  const { setImage } = useImageContext();
+  const { setImage } = useImageProcessing();
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 

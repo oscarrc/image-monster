@@ -1,9 +1,9 @@
 import { FiDownload } from "react-icons/fi";
 import { motion } from "framer-motion";
-import { useImageContext } from "@/contexts/ImageContext/useImageContext";
+import { useImageProcessing } from "@/contexts/ImageProcessingContext/useImageProcessing";
 
 const ResultPreview = () => {
-  const { image, processedImage } = useImageContext();
+  const { image, processedImage } = useImageProcessing();
 
   if (!image || !processedImage) return null;
 

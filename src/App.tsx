@@ -3,10 +3,10 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import Layout from "@/components/layout";
 import ProcessView from "@/views/ProcessView";
 import UploadView from "@/views/UploadView";
-import { useImageContext } from "@/contexts/ImageContext/useImageContext";
+import { useImageProcessing } from "@/contexts/ImageProcessingContext/useImageProcessing";
 
 const App = () => {
-  const { image } = useImageContext();
+  const { image } = useImageProcessing();
 
   return (
     <Layout>

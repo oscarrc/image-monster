@@ -1,24 +1,21 @@
+import { ReactNode, useCallback, useRef, useState } from "react";
 import { AutoModel, AutoProcessor, PreTrainedModel, Processor, ProgressInfo, RawImage, env } from '@huggingface/transformers';
-import { useCallback, useRef, useState } from 'react';
+import { ImageProcessingContext } from ".";
+import { MODES } from "../../types/imageProcessing";
 
 env.allowLocalModels = false;
 env.useBrowserCache = true;
-
-export enum MODES {
-  BACKGROUND = 'background',
-  ENHANCE = 'enhance',
-  STYLE = 'style',
-  SEGMENT = 'segment',
-}
 
 const MODELS = {
   [MODES.BACKGROUND]: "Xenova/modnet",
   [MODES.ENHANCE]: "Xenova/4x_APISR_GRL_GAN_generator-onnx",
   [MODES.STYLE]: "Xenova/arbitrary-style-transfer",
   [MODES.SEGMENT]: "Xenova/detr-resnet-50",
-}
+};
 
-export function useTransformerModel() {
+export const ImageProcessingProvider = ({ children }: { children: ReactNode }) => {
+  const [image, setImage] = useState<string | null>(null);
+  const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [mode, setMode] = useState<MODES>(MODES.BACKGROUND);
   const [isProcessing, setIsProcessing] = useState(false);
   const [modelLoading, setModelLoading] = useState(false);
@@ -44,7 +41,7 @@ export function useTransformerModel() {
       default:
         break;
     }
-  }
+  };
 
   const loadModel = useCallback(async () => {     
     model.current = await AutoModel.from_pretrained(MODELS[mode], {
@@ -61,7 +58,7 @@ export function useTransformerModel() {
 
     if (!model.current || !processor.current || processingMode !== mode) {
       await loadModel();
-    };
+    }
 
     const img = await RawImage.fromURL(image);
     
@@ -75,8 +72,7 @@ export function useTransformerModel() {
       )
     ).data;
 
-     const canvas = document.createElement("canvas");
-     
+    const canvas = document.createElement("canvas");
     canvas.width = img.width;
     canvas.height = img.height;
     const ctx = canvas.getContext("2d");
@@ -92,14 +88,31 @@ export function useTransformerModel() {
     setIsProcessing(false);
 
     return canvas.toDataURL("image/png", 1.0);
-  }
-  
-  return {
+  };
+
+  // Reset function
+  const resetImage = () => {
+    setImage(null);
+    setProcessedImage(null);
+  };
+
+  const value = {
+    image,
+    processedImage,
     mode,
-    setMode,
-    processImage,
     isProcessing,
     modelLoading,
     loadingProgress,
+    setImage,
+    setProcessedImage,
+    setMode,
+    processImage,
+    resetImage,
   };
-}
+
+  return (
+    <ImageProcessingContext.Provider value={value}>
+      {children}
+    </ImageProcessingContext.Provider>
+  );
+}; 

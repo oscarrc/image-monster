@@ -1,8 +1,8 @@
 import { FiArrowLeft, FiInfo } from "react-icons/fi";
-import { MODES, useTransformerModel } from "@/hooks/useTransformerModel";
 
+import { MODES } from "@/types/imageProcessing";
 import { motion } from "framer-motion";
-import { useImageContext } from "@/contexts/ImageContext/useImageContext";
+import { useImageProcessing } from "@/contexts/ImageProcessingContext/useImageProcessing";
 import { useNavigate } from "react-router-dom";
 
 const ModeInfo = {
@@ -25,15 +25,21 @@ const ModeInfo = {
 } as Record<string, { label: string; info: string }>;
 
 const Controls = () => {
-  const { image, resetImage, processedImage, setProcessedImage } =
-    useImageContext();
-
-  const { mode, setMode, isProcessing, processImage } = useTransformerModel();
-
+  const {
+    mode,
+    setMode,
+    isProcessing,
+    processImage,
+    image,
+    processedImage,
+    setImage,
+    setProcessedImage,
+  } = useImageProcessing();
   const navigate = useNavigate();
 
   const handleBack = () => {
-    resetImage();
+    setProcessedImage(null);
+    setImage(null);
     navigate("/");
   };
 

@@ -1,14 +1,10 @@
 import { motion } from "framer-motion";
-import { useImageContext } from "@/contexts/ImageContext/useImageContext";
+import { useImageProcessing } from "@/contexts/ImageProcessingContext/useImageProcessing";
 
 const ImagePreview = () => {
-  const { image } = useImageContext();
+  const { image, isProcessing, modelLoading, loadingProgress } = useImageProcessing();
 
   if (!image) return null;
-
-  const isProcessing = false;
-  const modelLoading = false; // Replace with actual loading state
-  const loadingProgress = 0; // Replace with actual loading progress
 
   return (
     <motion.div
