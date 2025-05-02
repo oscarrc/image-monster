@@ -274,6 +274,13 @@ export const ImageProcessingProvider = ({
     setProcessedImage(null);
   };
 
+  const resetProcessing = () => {
+    setIsProcessing(false);
+    setModelLoading(false);
+    setLoadingProgress(0);
+    setProcessedImage(null);
+  };
+
   const updateOptions = (
     mode: MODES,
     newOptions: Partial<ProcessingOptions[MODES]>
@@ -300,6 +307,7 @@ export const ImageProcessingProvider = ({
     setMode,
     processImage,
     resetImage,
+    resetProcessing,
     updateOptions,
   };
 

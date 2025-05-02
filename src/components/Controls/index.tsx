@@ -7,6 +7,7 @@ import StyleOptions from "./StyleOptions";
 import { motion } from "framer-motion";
 import { useImageProcessing } from "@/contexts/ImageProcessingContext/useImageProcessing";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/contexts/ToastContext/useToast";
 
 const ModeInfo = {
   [MODES.BACKGROUND]: {
@@ -38,9 +39,11 @@ const Controls = () => {
     image,
     processedImage,
     resetImage,
+    resetProcessing,
     setProcessedImage,
   } = useImageProcessing();
   const navigate = useNavigate();
+  const { addToast } = useToast();
 
   const handleBack = () => {
     resetImage();
@@ -54,6 +57,8 @@ const Controls = () => {
       setProcessedImage(processed);
     } catch (error) {
       console.error("Error processing image:", error);
+      addToast("Error processing image. Please try again.", "error");
+      resetProcessing();
     }
   };
 

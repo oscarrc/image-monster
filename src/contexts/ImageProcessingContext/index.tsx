@@ -15,6 +15,7 @@ export interface ImageProcessingContextType {
   setMode: (mode: MODES) => void;
   processImage: (mode: string, image: string | URL) => Promise<string>;
   resetImage: () => void;
+  resetProcessing: () => void;
   updateOptions: (
     mode: MODES,
     newOptions: Partial<ProcessingOptions[MODES]>
@@ -51,6 +52,7 @@ export const ImageProcessingContext = createContext<ImageProcessingContextType>(
     setMode: () => {},
     processImage: async () => "",
     resetImage: () => {},
+    resetProcessing: () => {},
     updateOptions: () => {},
   }
 );
