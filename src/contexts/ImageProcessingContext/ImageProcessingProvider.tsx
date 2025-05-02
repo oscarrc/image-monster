@@ -18,7 +18,7 @@ env.useBrowserCache = true;
 const MODELS = {
   [MODES.BACKGROUND]: "Xenova/modnet",
   [MODES.ENHANCE]: "Xenova/swin2SR-realworld-sr-x4-64-bsrgan-psnr",
-  [MODES.STYLE]: "Xenova/arbitrary-style-transfer",
+  [MODES.STYLE]: "Xenova/stable-diffusion-v1-5",
 };
 
 export const ImageProcessingProvider = ({
@@ -35,6 +35,7 @@ export const ImageProcessingProvider = ({
 
   const model = useRef<PreTrainedModel | null>(null);
   const processor = useRef<Processor | null>(null);
+  const styleImage = useRef<RawImage | null>(null);
 
   const progresCallback = (p: ProgressInfo) => {
     const { status } = p;
@@ -63,6 +64,10 @@ export const ImageProcessingProvider = ({
     processor.current = await AutoProcessor.from_pretrained(MODELS[mode], {
       device: "webgpu",
     });
+
+    if (mode === MODES.STYLE && !styleImage.current) {
+      styleImage.current = await RawImage.fromURL("/assets/styles/ghibbli.png");
+    }
   }, [mode]);
 
   const removeBackground = async (img: RawImage) => {
@@ -111,6 +116,33 @@ export const ImageProcessingProvider = ({
     return canvas.toDataURL("image/png", 1.0);
   };
 
+  const transferStyle = async (img: RawImage) => {
+    if (!styleImage.current) {
+      throw new Error("Style image not loaded");
+    }
+
+    const contentImage = await processor.current!(img);
+    const styleImageProcessed = await processor.current!(styleImage.current);
+
+    const { output } = await model.current!({
+      prompt: "ghibli style",
+      image: contentImage.pixel_values,
+      style_image: styleImageProcessed.pixel_values,
+      num_inference_steps: 20,
+      guidance_scale: 7.5,
+    });
+
+    const styledImage = await RawImage.fromTensor(output[0].mul(255).clamp(0, 255).to("uint8"));
+    const canvas = document.createElement("canvas");
+    canvas.width = styledImage.width;
+    canvas.height = styledImage.height;
+    const ctx = canvas.getContext("2d");
+
+    ctx!.drawImage(styledImage.toCanvas(), 0, 0);
+
+    return canvas.toDataURL("image/png", 1.0);
+  };
+
   const processImage = async (processingMode: string, image: string | URL) => {
     setIsProcessing(true);
 
@@ -125,6 +157,9 @@ export const ImageProcessingProvider = ({
         break;
       case MODES.ENHANCE:
         processedImage = await enhanceImage(img);
+        break;
+      case MODES.STYLE:
+        processedImage = await transferStyle(img);
         break;
       default:
         break;
