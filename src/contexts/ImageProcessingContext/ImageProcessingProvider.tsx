@@ -17,7 +17,7 @@ env.useBrowserCache = true;
 
 const MODELS = {
   [MODES.BACKGROUND]: "Xenova/modnet",
-  [MODES.ENHANCE]: "Xenova/4x_APISR_GRL_GAN_generator-onnx",
+  [MODES.ENHANCE]: "Xenova/swin2SR-realworld-sr-x4-64-bsrgan-psnr",
   [MODES.STYLE]: "Xenova/arbitrary-style-transfer",
   [MODES.SEGMENT]: "Xenova/detr-resnet-50",
 };
@@ -57,25 +57,7 @@ export const ImageProcessingProvider = ({
     }
   };
 
-  const loadModel = useCallback(async () => {
-    model.current = await AutoModel.from_pretrained(MODELS[mode], {
-      device: "webgpu",
-      progress_callback: progresCallback,
-    });
-    processor.current = await AutoProcessor.from_pretrained(MODELS[mode], {
-      device: "webgpu",
-    });
-  }, [mode]);
-
-  const processImage = async (processingMode: string, image: string | URL) => {
-    setIsProcessing(true);
-
-    if (!model.current || !processor.current || processingMode !== mode) {
-      await loadModel();
-    }
-
-    const img = await RawImage.fromURL(image);
-
+  const removeBackground = async (img: RawImage) => {
     const { pixel_values } = await processor.current!(img);
     const { output } = await model.current!({ input: pixel_values });
 
@@ -102,6 +84,38 @@ export const ImageProcessingProvider = ({
     setIsProcessing(false);
 
     return canvas.toDataURL("image/png", 1.0);
+  };
+
+  const loadModel = useCallback(async () => {
+    model.current = await AutoModel.from_pretrained(MODELS[mode], {
+      device: "webgpu",
+      progress_callback: progresCallback,
+    });
+    processor.current = await AutoProcessor.from_pretrained(MODELS[mode], {
+      device: "webgpu",
+    });
+  }, [mode]);
+
+  const processImage = async (processingMode: string, image: string | URL) => {
+    setIsProcessing(true);
+
+    if (!model.current || !processor.current || processingMode !== mode) {
+      await loadModel();
+    }
+
+    const img = await RawImage.fromURL(image);
+    let processedImage: string = "";
+
+    switch (processingMode) {
+      case MODES.BACKGROUND:
+        processedImage = await removeBackground(img);
+        break;
+      default:
+        break;
+    }
+
+    setIsProcessing(false);
+    return processedImage || "";
   };
 
   // Reset function
