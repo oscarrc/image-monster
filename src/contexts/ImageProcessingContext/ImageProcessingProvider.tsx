@@ -170,12 +170,13 @@ export const ImageProcessingProvider = ({
     }
 
     const processed = await processor.current!(processedImg);
-    const { output } = await model.current!({
+    const { reconstruction } = await model.current!({
       pixel_values: processed.pixel_values,
     });
 
-    const uint8Tensor = output[0].mul(255).clamp(0, 255).to("uint8");
-    const enhancedImage = await RawImage.fromTensor(uint8Tensor);
+    const enhancedImage = await RawImage.fromTensor(
+      reconstruction[0].mul(255).to("uint8")
+    ).resize(img.width, img.height);
 
     // Apply scaling if needed
     if (options.scale !== 1.0) {
