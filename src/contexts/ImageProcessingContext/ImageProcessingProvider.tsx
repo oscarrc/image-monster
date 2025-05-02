@@ -1,5 +1,14 @@
+import {
+  AutoModel,
+  AutoProcessor,
+  PreTrainedModel,
+  Processor,
+  ProgressInfo,
+  RawImage,
+  env,
+} from "@huggingface/transformers";
 import { ReactNode, useCallback, useRef, useState } from "react";
-import { AutoModel, AutoProcessor, PreTrainedModel, Processor, ProgressInfo, RawImage, env } from '@huggingface/transformers';
+
 import { ImageProcessingContext } from ".";
 import { MODES } from "../../types/imageProcessing";
 
@@ -13,7 +22,11 @@ const MODELS = {
   [MODES.SEGMENT]: "Xenova/detr-resnet-50",
 };
 
-export const ImageProcessingProvider = ({ children }: { children: ReactNode }) => {
+export const ImageProcessingProvider = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
   const [image, setImage] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const [mode, setMode] = useState<MODES>(MODES.BACKGROUND);
@@ -25,11 +38,12 @@ export const ImageProcessingProvider = ({ children }: { children: ReactNode }) =
   const processor = useRef<Processor | null>(null);
 
   const progresCallback = (p: ProgressInfo) => {
+    console.log(p);
     const { status } = p;
 
     switch (status) {
       case "progress":
-        setLoadingProgress(Math.round(p.progress * 100));
+        setLoadingProgress(Math.round(p.progress));
         break;
       case "initiate":
         setModelLoading(true);
@@ -43,10 +57,10 @@ export const ImageProcessingProvider = ({ children }: { children: ReactNode }) =
     }
   };
 
-  const loadModel = useCallback(async () => {     
+  const loadModel = useCallback(async () => {
     model.current = await AutoModel.from_pretrained(MODELS[mode], {
-      device: "webgpu",    
-      progress_callback: progresCallback, 
+      device: "webgpu",
+      progress_callback: progresCallback,
     });
     processor.current = await AutoProcessor.from_pretrained(MODELS[mode], {
       device: "webgpu",
@@ -61,14 +75,14 @@ export const ImageProcessingProvider = ({ children }: { children: ReactNode }) =
     }
 
     const img = await RawImage.fromURL(image);
-    
+
     const { pixel_values } = await processor.current!(img);
     const { output } = await model.current!({ input: pixel_values });
 
     const maskData = (
       await RawImage.fromTensor(output[0].mul(255).to("uint8")).resize(
         img.width,
-        img.height,
+        img.height
       )
     ).data;
 
@@ -115,4 +129,4 @@ export const ImageProcessingProvider = ({ children }: { children: ReactNode }) =
       {children}
     </ImageProcessingContext.Provider>
   );
-}; 
+};

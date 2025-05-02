@@ -2,7 +2,8 @@ import { motion } from "framer-motion";
 import { useImageProcessing } from "@/contexts/ImageProcessingContext/useImageProcessing";
 
 const ImagePreview = () => {
-  const { image, isProcessing, modelLoading, loadingProgress } = useImageProcessing();
+  const { image, isProcessing, modelLoading, loadingProgress } =
+    useImageProcessing();
 
   if (!image) return null;
 
@@ -32,10 +33,12 @@ const ImagePreview = () => {
               </p>
               <progress
                 className="progress progress-primary w-56"
-                value={loadingProgress}
+                {...(loadingProgress < 100 ? { value: loadingProgress } : {})}
                 max="100"
               ></progress>
-              <p className="text-xs mt-1">{loadingProgress}%</p>
+              {loadingProgress < 100 && (
+                <p className="text-xs mt-1">{loadingProgress}%</p>
+              )}
             </div>
           </div>
         )}
