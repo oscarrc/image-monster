@@ -38,12 +38,11 @@ export const ImageProcessingProvider = ({
   const processor = useRef<Processor | null>(null);
 
   const progresCallback = (p: ProgressInfo) => {
-    console.log(p);
     const { status } = p;
 
     switch (status) {
       case "progress":
-        setLoadingProgress(Math.round(p.progress));
+        setLoadingProgress(Math.round(p.progress * 100));
         break;
       case "initiate":
         setModelLoading(true);
@@ -56,6 +55,16 @@ export const ImageProcessingProvider = ({
         break;
     }
   };
+
+  const loadModel = useCallback(async () => {
+    model.current = await AutoModel.from_pretrained(MODELS[mode], {
+      device: "webgpu",
+      progress_callback: progresCallback,
+    });
+    processor.current = await AutoProcessor.from_pretrained(MODELS[mode], {
+      device: "webgpu",
+    });
+  }, [mode]);
 
   const removeBackground = async (img: RawImage) => {
     const { pixel_values } = await processor.current!(img);
@@ -81,27 +90,39 @@ export const ImageProcessingProvider = ({
     }
     ctx!.putImageData(pixelData, 0, 0);
 
-    setIsProcessing(false);
-
     return canvas.toDataURL("image/png", 1.0);
   };
 
-  const loadModel = useCallback(async () => {
-    model.current = await AutoModel.from_pretrained(MODELS[mode], {
-      device: "webgpu",
-      progress_callback: progresCallback,
+  const enhanceImage = async (img: RawImage) => {
+    // Process the image to get the correct input format
+    const processed = await processor.current!(img);
+    console.log("Processed Image: ", processed);
+    // The model expects pixel_values in a specific format
+    const { output } = await model.current!({
+      pixel_values: processed.pixel_values,
     });
-    processor.current = await AutoProcessor.from_pretrained(MODELS[mode], {
-      device: "webgpu",
-    });
-  }, [mode]);
+
+    // Convert float32 tensor to uint8 and clamp values between 0-255
+    const uint8Tensor = output[0].mul(255).clamp(0, 255).to("uint8");
+
+    // Convert the enhanced image tensor to a canvas
+    const enhancedImage = await RawImage.fromTensor(uint8Tensor);
+    const canvas = document.createElement("canvas");
+    canvas.width = enhancedImage.width;
+    canvas.height = enhancedImage.height;
+    const ctx = canvas.getContext("2d");
+
+    // Draw the enhanced image to the canvas
+    ctx!.drawImage(enhancedImage.toCanvas(), 0, 0);
+
+    // Convert to data URL
+    return canvas.toDataURL("image/png", 1.0);
+  };
 
   const processImage = async (processingMode: string, image: string | URL) => {
     setIsProcessing(true);
 
-    if (!model.current || !processor.current || processingMode !== mode) {
-      await loadModel();
-    }
+    await loadModel();
 
     const img = await RawImage.fromURL(image);
     let processedImage: string = "";
@@ -110,12 +131,15 @@ export const ImageProcessingProvider = ({
       case MODES.BACKGROUND:
         processedImage = await removeBackground(img);
         break;
+      case MODES.ENHANCE:
+        processedImage = await enhanceImage(img);
+        break;
       default:
         break;
     }
 
     setIsProcessing(false);
-    return processedImage || "";
+    return processedImage;
   };
 
   // Reset function
