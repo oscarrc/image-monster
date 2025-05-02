@@ -10,14 +10,6 @@ const BackgroundOptions = () => {
     });
   };
 
-  const handleMaskBackgroundChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    updateOptions(MODES.BACKGROUND, {
-      maskBackground: e.target.checked,
-    });
-  };
-
   return (
     <div className="space-y-4">
       <div className="form-control">
@@ -36,17 +28,6 @@ const BackgroundOptions = () => {
           onChange={handleThresholdChange}
           className="range range-primary range-xs w-full"
         />
-      </div>
-      <div className="form-control">
-        <label className="label cursor-pointer">
-          <span className="label-text">Mask Background</span>
-          <input
-            type="checkbox"
-            checked={options.background.maskBackground}
-            onChange={handleMaskBackgroundChange}
-            className="checkbox checkbox-primary"
-          />
-        </label>
       </div>
     </div>
   );

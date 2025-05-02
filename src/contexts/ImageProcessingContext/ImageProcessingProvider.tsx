@@ -24,7 +24,6 @@ const MODELS = {
 const DEFAULT_OPTIONS: ProcessingOptions = {
   [MODES.BACKGROUND]: {
     threshold: 0.5,
-    maskBackground: true,
   },
   [MODES.ENHANCE]: {
     scale: 1.0,
@@ -96,8 +95,6 @@ export const ImageProcessingProvider = ({
     const { pixel_values } = await processor.current!(img);
     const { output } = await model.current!({
       input: pixel_values,
-      threshold: options.threshold,
-      mask_background: options.maskBackground,
     });
 
     const maskData = (
@@ -106,6 +103,15 @@ export const ImageProcessingProvider = ({
         img.height
       )
     ).data;
+
+    for (let i = 0; i < maskData.length; ++i) {
+      // If thresholding is enabled:
+      if (maskData[i] / 255 < options.threshold) {
+        maskData[i] = 0;
+      } else {
+        maskData[i] = 255;
+      }
+    }
 
     const canvas = document.createElement("canvas");
     canvas.width = img.width;

@@ -6,7 +6,6 @@ export enum MODES {
 
 export interface BackgroundOptions {
   threshold: number;
-  maskBackground: boolean;
 }
 
 export interface EnhanceOptions {

@@ -116,7 +116,7 @@ const StyleOptions = () => {
       </div>
       <div className="mt-4">
         <label className="label">
-          <span className="label-text">Style Reference</span>
+          <span className="label-text">Style Preview</span>
         </label>
         <div className="relative w-full rounded-lg overflow-hidden bg-base-300">
           <img
