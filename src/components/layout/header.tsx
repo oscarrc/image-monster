@@ -56,34 +56,22 @@ const Header = () => {
           </Link>
         </div>
         <div className="flex gap-2 flex-none">
-          <motion.a
+          <a
             href="https://github.com/username/image-monster"
             target="_blank"
             rel="noopener noreferrer"
             className="btn btn-ghost btn-circle"
-            whileHover={{
-              scale: 1.1,
-              backgroundColor: "hsl(var(--p))",
-              color: "hsl(var(--pc))",
-            }}
-            whileTap={{ scale: 0.95 }}
           >
             <PiGithubLogoFill className="h-6 w-6" />
-          </motion.a>
-          <motion.a
+          </a>
+          <a
             href="https://ko-fi.com/username"
             target="_blank"
             rel="noopener noreferrer"
             className="btn btn-ghost btn-circle"
-            whileHover={{
-              scale: 1.1,
-              backgroundColor: "hsl(var(--p))",
-              color: "hsl(var(--pc))",
-            }}
-            whileTap={{ scale: 0.95 }}
           >
             <SiKofi className="h-6 w-6" />
-          </motion.a>
+          </a>
         </div>
       </nav>
     </motion.header>

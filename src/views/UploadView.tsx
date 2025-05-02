@@ -38,6 +38,40 @@ const UploadView = () => {
         </p>
       </motion.div>
       <Uploader />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="text-center space-y-2"
+      >
+        <div className="stats stats-vertical sm:stats-horizontal">
+          <div className="stat">
+            <div className="stat-value">
+              Background
+              <br />
+              <span className="text-primary">Removal</span>
+            </div>
+          </div>
+          <div className="stat">
+            <div className="stat-value text-base-content/70 hover:text-primary">
+              Image
+              <br />
+              <span className="text-primary">Enhacement</span>
+            </div>
+          </div>
+          <div className="stat">
+            <div className="stat-value text-base-content/70 hover:text-primary">
+              Style
+              <br />
+              <span className="text-primary">Transfer</span>
+            </div>
+          </div>
+        </div>
+        <p className="text-base-content/70 max-w-2xl mx-auto">
+          No sign-up required. Just upload your image and let the monster do the
+          rest!
+        </p>
+      </motion.div>
     </motion.div>
   );
 };
