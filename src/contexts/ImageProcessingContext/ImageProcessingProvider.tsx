@@ -7,10 +7,10 @@ import {
   RawImage,
   env,
 } from "@huggingface/transformers";
+import { MODES, ProcessingOptions } from "../../types/imageProcessing";
 import { ReactNode, useCallback, useRef, useState } from "react";
 
 import { ImageProcessingContext } from ".";
-import { MODES } from "../../types/imageProcessing";
 
 env.allowLocalModels = false;
 env.useBrowserCache = true;
@@ -19,6 +19,24 @@ const MODELS = {
   [MODES.BACKGROUND]: "Xenova/modnet",
   [MODES.ENHANCE]: "Xenova/swin2SR-realworld-sr-x4-64-bsrgan-psnr",
   [MODES.STYLE]: "Xenova/stable-diffusion-v1-5",
+};
+
+const DEFAULT_OPTIONS: ProcessingOptions = {
+  [MODES.BACKGROUND]: {
+    threshold: 0.5,
+    maskBackground: true,
+  },
+  [MODES.ENHANCE]: {
+    scale: 1.0,
+    zoomEnabled: false,
+    zoomLevel: 50,
+  },
+  [MODES.STYLE]: {
+    styleStrength: 0.5,
+    numInferenceSteps: 20,
+    guidanceScale: 7.5,
+    style: "Ghibli",
+  },
 };
 
 export const ImageProcessingProvider = ({
@@ -32,6 +50,7 @@ export const ImageProcessingProvider = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [modelLoading, setModelLoading] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const [options, setOptions] = useState<ProcessingOptions>(DEFAULT_OPTIONS);
 
   const model = useRef<PreTrainedModel | null>(null);
   const processor = useRef<Processor | null>(null);
@@ -70,9 +89,16 @@ export const ImageProcessingProvider = ({
     }
   }, [mode]);
 
-  const removeBackground = async (img: RawImage) => {
+  const removeBackground = async (
+    img: RawImage,
+    options: ProcessingOptions[MODES.BACKGROUND]
+  ) => {
     const { pixel_values } = await processor.current!(img);
-    const { output } = await model.current!({ input: pixel_values });
+    const { output } = await model.current!({
+      input: pixel_values,
+      threshold: options.threshold,
+      mask_background: options.maskBackground,
+    });
 
     const maskData = (
       await RawImage.fromTensor(output[0].mul(255).to("uint8")).resize(
@@ -97,15 +123,72 @@ export const ImageProcessingProvider = ({
     return canvas.toDataURL("image/png", 1.0);
   };
 
-  const enhanceImage = async (img: RawImage) => {
-    const processed = await processor.current!(img);
+  const enhanceImage = async (
+    img: RawImage,
+    options: ProcessingOptions[MODES.ENHANCE]
+  ) => {
+    let processedImg = img;
+
+    // Apply zoom if enabled
+    if (options.zoomEnabled) {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      const zoomFactor = options.zoomLevel / 100;
+      const cropWidth = img.width * zoomFactor;
+      const cropHeight = img.height * zoomFactor;
+      const cropX = (img.width - cropWidth) / 2;
+      const cropY = (img.height - cropHeight) / 2;
+
+      ctx!.drawImage(
+        img.toCanvas(),
+        cropX,
+        cropY,
+        cropWidth,
+        cropHeight,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+      processedImg = await RawImage.fromCanvas(canvas);
+    }
+
+    const processed = await processor.current!(processedImg);
     const { output } = await model.current!({
       pixel_values: processed.pixel_values,
     });
 
     const uint8Tensor = output[0].mul(255).clamp(0, 255).to("uint8");
-
     const enhancedImage = await RawImage.fromTensor(uint8Tensor);
+
+    // Apply scaling if needed
+    if (options.scale !== 1.0) {
+      const scaledCanvas = document.createElement("canvas");
+      const scaledCtx = scaledCanvas.getContext("2d");
+
+      scaledCanvas.width = enhancedImage.width * options.scale;
+      scaledCanvas.height = enhancedImage.height * options.scale;
+
+      if (scaledCtx) {
+        scaledCtx.imageSmoothingEnabled = true;
+        scaledCtx.imageSmoothingQuality = "high";
+        scaledCtx.drawImage(
+          enhancedImage.toCanvas(),
+          0,
+          0,
+          scaledCanvas.width,
+          scaledCanvas.height
+        );
+      }
+
+      return scaledCanvas.toDataURL("image/png", 1.0);
+    }
+
     const canvas = document.createElement("canvas");
     canvas.width = enhancedImage.width;
     canvas.height = enhancedImage.height;
@@ -116,7 +199,10 @@ export const ImageProcessingProvider = ({
     return canvas.toDataURL("image/png", 1.0);
   };
 
-  const transferStyle = async (img: RawImage) => {
+  const transferStyle = async (
+    img: RawImage,
+    options: ProcessingOptions[MODES.STYLE]
+  ) => {
     if (!styleImage.current) {
       throw new Error("Style image not loaded");
     }
@@ -128,11 +214,14 @@ export const ImageProcessingProvider = ({
       prompt: "ghibli style",
       image: contentImage.pixel_values,
       style_image: styleImageProcessed.pixel_values,
-      num_inference_steps: 20,
-      guidance_scale: 7.5,
+      num_inference_steps: options.numInferenceSteps,
+      guidance_scale: options.guidanceScale,
+      style_strength: options.styleStrength,
     });
 
-    const styledImage = await RawImage.fromTensor(output[0].mul(255).clamp(0, 255).to("uint8"));
+    const styledImage = await RawImage.fromTensor(
+      output[0].mul(255).clamp(0, 255).to("uint8")
+    );
     const canvas = document.createElement("canvas");
     canvas.width = styledImage.width;
     canvas.height = styledImage.height;
@@ -145,7 +234,6 @@ export const ImageProcessingProvider = ({
 
   const processImage = async (processingMode: string, image: string | URL) => {
     setIsProcessing(true);
-
     await loadModel();
 
     const img = await RawImage.fromURL(image);
@@ -153,13 +241,13 @@ export const ImageProcessingProvider = ({
 
     switch (processingMode) {
       case MODES.BACKGROUND:
-        processedImage = await removeBackground(img);
+        processedImage = await removeBackground(img, options[MODES.BACKGROUND]);
         break;
       case MODES.ENHANCE:
-        processedImage = await enhanceImage(img);
+        processedImage = await enhanceImage(img, options[MODES.ENHANCE]);
         break;
       case MODES.STYLE:
-        processedImage = await transferStyle(img);
+        processedImage = await transferStyle(img, options[MODES.STYLE]);
         break;
       default:
         break;
@@ -169,10 +257,22 @@ export const ImageProcessingProvider = ({
     return processedImage;
   };
 
-  // Reset function
   const resetImage = () => {
     setImage(null);
     setProcessedImage(null);
+  };
+
+  const updateOptions = (
+    mode: MODES,
+    newOptions: Partial<ProcessingOptions[MODES]>
+  ) => {
+    setOptions((prev) => ({
+      ...prev,
+      [mode]: {
+        ...prev[mode],
+        ...newOptions,
+      },
+    }));
   };
 
   const value = {
@@ -182,11 +282,13 @@ export const ImageProcessingProvider = ({
     isProcessing,
     modelLoading,
     loadingProgress,
+    options,
     setImage,
     setProcessedImage,
     setMode,
     processImage,
     resetImage,
+    updateOptions,
   };
 
   return (

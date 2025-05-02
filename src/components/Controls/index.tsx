@@ -4,21 +4,27 @@ import { MODES } from "@/types/imageProcessing";
 import { motion } from "framer-motion";
 import { useImageProcessing } from "@/contexts/ImageProcessingContext/useImageProcessing";
 import { useNavigate } from "react-router-dom";
+import BackgroundOptions from "./BackgroundOptions";
+import EnhanceOptions from "./EnhanceOptions";
+import StyleOptions from "./StyleOptions";
 
 const ModeInfo = {
   [MODES.BACKGROUND]: {
     label: "Remove Background",
     info: "This will remove the background from your image, keeping only the main subject.",
+    options: BackgroundOptions,
   },
   [MODES.ENHANCE]: {
     label: "Enhance",
     info: "This will enhance the details and quality of your image with AI upscaling.",
+    options: EnhanceOptions,
   },
   [MODES.STYLE]: {
     label: "Style Transfer",
-    info: "This will apply an artistic style (Kandinsky) to your image.",
+    info: "This will apply an artistic style (Ghibli) to your image.",
+    options: StyleOptions,
   },
-} as Record<string, { label: string; info: string }>;
+} as Record<string, { label: string; info: string; options: React.ComponentType }>;
 
 const Controls = () => {
   const {
@@ -50,6 +56,8 @@ const Controls = () => {
 
   if (!image) return null;
 
+  const OptionsComponent = ModeInfo[mode].options;
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -77,6 +85,7 @@ const Controls = () => {
         </div>
 
         <div className="space-y-4 flex flex-col flex-1">
+          <OptionsComponent />
           <div className="alert border border-primary text-primary mt-auto">
             <FiInfo className="w-5 h-5" />
             <span>{ModeInfo[mode].info}</span>

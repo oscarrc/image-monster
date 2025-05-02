@@ -1,24 +1,56 @@
+import { MODES, ProcessingOptions } from "@/types/imageProcessing";
+
 import { createContext } from "react";
-import { MODES } from "../../types/imageProcessing";
 
 export interface ImageProcessingContextType {
-  // Image states
   image: string | null;
   processedImage: string | null;
   mode: MODES;
   isProcessing: boolean;
   modelLoading: boolean;
   loadingProgress: number;
-
-  // Actions
+  options: ProcessingOptions;
   setImage: (image: string | null) => void;
   setProcessedImage: (image: string | null) => void;
   setMode: (mode: MODES) => void;
-  processImage: (processingMode: string, image: string | URL) => Promise<string>;
+  processImage: (mode: string, image: string | URL) => Promise<string>;
   resetImage: () => void;
+  updateOptions: (
+    mode: MODES,
+    newOptions: Partial<ProcessingOptions[MODES]>
+  ) => void;
 }
 
-// Create context with default values
-export const ImageProcessingContext = createContext<ImageProcessingContextType | undefined>(
-  undefined
-); 
+export const ImageProcessingContext = createContext<ImageProcessingContextType>(
+  {
+    image: null,
+    processedImage: null,
+    mode: MODES.BACKGROUND,
+    isProcessing: false,
+    modelLoading: false,
+    loadingProgress: 0,
+    options: {
+      [MODES.BACKGROUND]: {
+        threshold: 0.5,
+        maskBackground: true,
+      },
+      [MODES.ENHANCE]: {
+        scale: 1.0,
+        zoomEnabled: false,
+        zoomLevel: 50,
+      },
+      [MODES.STYLE]: {
+        styleStrength: 0.5,
+        numInferenceSteps: 20,
+        guidanceScale: 7.5,
+        style: "Ghibli",
+      },
+    },
+    setImage: () => {},
+    setProcessedImage: () => {},
+    setMode: () => {},
+    processImage: async () => "",
+    resetImage: () => {},
+    updateOptions: () => {},
+  }
+);
