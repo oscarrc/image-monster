@@ -53,14 +53,14 @@ const UploadView = () => {
             </div>
           </div>
           <div className="stat">
-            <div className="stat-value text-base-content/70 hover:text-primary">
+            <div className="stat-value">
               Image
               <br />
               <span className="text-primary">Enhacement</span>
             </div>
           </div>
           <div className="stat">
-            <div className="stat-value text-base-content/70 hover:text-primary">
+            <div className="stat-value">
               Style
               <br />
               <span className="text-primary">Transfer</span>

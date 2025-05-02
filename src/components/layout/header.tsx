@@ -57,7 +57,7 @@ const Header = () => {
         </div>
         <div className="flex gap-2 flex-none">
           <a
-            href="https://github.com/username/image-monster"
+            href="https://github.com/oscarrc/image-monster"
             target="_blank"
             rel="noopener noreferrer"
             className="btn btn-ghost btn-circle"
@@ -65,7 +65,7 @@ const Header = () => {
             <PiGithubLogoFill className="h-6 w-6" />
           </a>
           <a
-            href="https://ko-fi.com/username"
+            href="https://ko-fi.com/oscarrc"
             target="_blank"
             rel="noopener noreferrer"
             className="btn btn-ghost btn-circle"
