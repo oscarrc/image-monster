@@ -1,0 +1,10 @@
+@import "tailwindcss";
+@plugin "daisyui" {
+  themes: abyss --default, abyss --prefersdark, cupcake;
+}
+
+@layer utilities {
+  .layout-grid {
+    grid-template-rows: 1fr 20fr 1fr;
+  }
+}
