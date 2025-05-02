@@ -32,6 +32,7 @@ export const ImageProcessingContext = createContext<ImageProcessingContextType>(
     options: {
       [MODES.BACKGROUND]: {
         threshold: 0.5,
+        thresholdEnabled: true,
       },
       [MODES.ENHANCE]: {
         scale: 1.0,

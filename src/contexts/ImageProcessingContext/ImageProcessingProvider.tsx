@@ -17,13 +17,14 @@ env.useBrowserCache = true;
 
 const MODELS = {
   [MODES.BACKGROUND]: "Xenova/modnet",
-  [MODES.ENHANCE]: "Xenova/swin2SR-realworld-sr-x4-64-bsrgan-psnr",
+  [MODES.ENHANCE]: "Xenova/swin2SR-classical-sr-x2-64",
   [MODES.STYLE]: "Xenova/stable-diffusion-v1-5",
 };
 
 const DEFAULT_OPTIONS: ProcessingOptions = {
   [MODES.BACKGROUND]: {
     threshold: 0.5,
+    thresholdEnabled: true,
   },
   [MODES.ENHANCE]: {
     scale: 1.0,
@@ -77,10 +78,12 @@ export const ImageProcessingProvider = ({
   const loadModel = useCallback(async () => {
     model.current = await AutoModel.from_pretrained(MODELS[mode], {
       device: "webgpu",
+      dtype: "q8",
       progress_callback: progresCallback,
     });
     processor.current = await AutoProcessor.from_pretrained(MODELS[mode], {
       device: "webgpu",
+      dtype: "q8",
     });
 
     if (mode === MODES.STYLE && !styleImage.current) {
@@ -104,12 +107,14 @@ export const ImageProcessingProvider = ({
       )
     ).data;
 
-    for (let i = 0; i < maskData.length; ++i) {
-      // If thresholding is enabled:
-      if (maskData[i] / 255 < options.threshold) {
-        maskData[i] = 0;
-      } else {
-        maskData[i] = 255;
+    if (options.thresholdEnabled) {
+      for (let i = 0; i < maskData.length; ++i) {
+        // If thresholding is enabled:
+        if (maskData[i] / 255 < options.threshold) {
+          maskData[i] = 0;
+        } else {
+          maskData[i] = 255;
+        }
       }
     }
 
