@@ -19,7 +19,6 @@ const MODELS = {
   [MODES.BACKGROUND]: "Xenova/modnet",
   [MODES.ENHANCE]: "Xenova/swin2SR-realworld-sr-x4-64-bsrgan-psnr",
   [MODES.STYLE]: "Xenova/arbitrary-style-transfer",
-  [MODES.SEGMENT]: "Xenova/detr-resnet-50",
 };
 
 export const ImageProcessingProvider = ({
@@ -94,28 +93,21 @@ export const ImageProcessingProvider = ({
   };
 
   const enhanceImage = async (img: RawImage) => {
-    // Process the image to get the correct input format
     const processed = await processor.current!(img);
-    console.log("Processed Image: ", processed);
-    // The model expects pixel_values in a specific format
     const { output } = await model.current!({
       pixel_values: processed.pixel_values,
     });
 
-    // Convert float32 tensor to uint8 and clamp values between 0-255
     const uint8Tensor = output[0].mul(255).clamp(0, 255).to("uint8");
 
-    // Convert the enhanced image tensor to a canvas
     const enhancedImage = await RawImage.fromTensor(uint8Tensor);
     const canvas = document.createElement("canvas");
     canvas.width = enhancedImage.width;
     canvas.height = enhancedImage.height;
     const ctx = canvas.getContext("2d");
 
-    // Draw the enhanced image to the canvas
     ctx!.drawImage(enhancedImage.toCanvas(), 0, 0);
 
-    // Convert to data URL
     return canvas.toDataURL("image/png", 1.0);
   };
 

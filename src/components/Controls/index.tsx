@@ -18,10 +18,6 @@ const ModeInfo = {
     label: "Style Transfer",
     info: "This will apply an artistic style (Kandinsky) to your image.",
   },
-  [MODES.SEGMENT]: {
-    label: "Object Detection",
-    info: "This will detect and identify objects in your image.",
-  },
 } as Record<string, { label: string; info: string }>;
 
 const Controls = () => {
@@ -32,14 +28,13 @@ const Controls = () => {
     processImage,
     image,
     processedImage,
-    setImage,
+    resetImage,
     setProcessedImage,
   } = useImageProcessing();
   const navigate = useNavigate();
 
   const handleBack = () => {
-    setProcessedImage(null);
-    setImage(null);
+    resetImage();
     navigate("/");
   };
 
