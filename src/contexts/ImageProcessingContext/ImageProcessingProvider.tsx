@@ -8,7 +8,7 @@ import {
   env,
 } from "@huggingface/transformers";
 import { MODES, ProcessingOptions } from "../../types/imageProcessing";
-import { ReactNode, useCallback, useRef, useState } from "react";
+import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 
 import { ImageProcessingContext } from ".";
 
@@ -75,21 +75,60 @@ export const ImageProcessingProvider = ({
     }
   };
 
-  const loadModel = useCallback(async () => {
-    model.current = await AutoModel.from_pretrained(MODELS[mode], {
-      device: "webgpu",
-      dtype: "q8",
-      progress_callback: progresCallback,
-    });
-    processor.current = await AutoProcessor.from_pretrained(MODELS[mode], {
-      device: "webgpu",
-      dtype: "q8",
-    });
-
-    if (mode === MODES.STYLE && !styleImage.current) {
-      styleImage.current = await RawImage.fromURL("/assets/styles/ghibbli.png");
+  // Cleanup function to dispose of WebGPU resources
+  const cleanup = useCallback(() => {
+    if (model.current) {
+      try {
+        model.current.dispose();
+        model.current = null;
+      } catch (error) {
+        console.error("Error disposing model:", error);
+      }
     }
-  }, [mode]);
+    processor.current = null;
+    styleImage.current = null;
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      cleanup();
+    };
+  }, [cleanup]);
+
+  const loadModel = useCallback(async () => {
+    try {
+      // Cleanup existing resources before loading new ones
+      cleanup();
+
+      model.current = await AutoModel.from_pretrained(MODELS[mode], {
+        device: "webgpu",
+        dtype: "q8",
+        progress_callback: progresCallback,
+      });
+      processor.current = await AutoProcessor.from_pretrained(MODELS[mode], {
+        device: "webgpu",
+        dtype: "q8",
+      });
+
+      if (mode === MODES.STYLE && !styleImage.current) {
+        try {
+          styleImage.current = await RawImage.fromURL(
+            "/assets/styles/ghibbli.png"
+          );
+        } catch {
+          throw new Error("Failed to load style image");
+        }
+      }
+    } catch (error) {
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error(
+          "GPU resources are no longer available. Please refresh the page and try again."
+        );
+      }
+      throw new Error("Failed to load AI model");
+    }
+  }, [mode, cleanup]);
 
   const removeBackground = async (
     img: RawImage,
@@ -245,28 +284,53 @@ export const ImageProcessingProvider = ({
   };
 
   const processImage = async (processingMode: string, image: string | URL) => {
-    setIsProcessing(true);
-    await loadModel();
-
-    const img = await RawImage.fromURL(image);
-    let processedImage: string = "";
-
-    switch (processingMode) {
-      case MODES.BACKGROUND:
-        processedImage = await removeBackground(img, options[MODES.BACKGROUND]);
-        break;
-      case MODES.ENHANCE:
-        processedImage = await enhanceImage(img, options[MODES.ENHANCE]);
-        break;
-      case MODES.STYLE:
-        processedImage = await transferStyle(img, options[MODES.STYLE]);
-        break;
-      default:
-        break;
+    if (!image) {
+      throw new Error("No image provided");
     }
 
-    setIsProcessing(false);
-    return processedImage;
+    setIsProcessing(true);
+    try {
+      await loadModel();
+
+      let img: RawImage;
+      try {
+        img = await RawImage.fromURL(image);
+      } catch {
+        throw new Error("Failed to load image");
+      }
+
+      let processedImage: string = "";
+
+      try {
+        switch (processingMode) {
+          case MODES.BACKGROUND:
+            processedImage = await removeBackground(
+              img,
+              options[MODES.BACKGROUND]
+            );
+            break;
+          case MODES.ENHANCE:
+            processedImage = await enhanceImage(img, options[MODES.ENHANCE]);
+            break;
+          case MODES.STYLE:
+            processedImage = await transferStyle(img, options[MODES.STYLE]);
+            break;
+          default:
+            throw new Error("Invalid processing mode");
+        }
+      } catch (error) {
+        if (error instanceof Error && error.name === "AbortError") {
+          throw new Error(
+            "GPU resources are no longer available. Please refresh the page and try again."
+          );
+        }
+        throw error;
+      }
+
+      return processedImage;
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const resetImage = () => {

@@ -47,6 +47,7 @@ const Controls = () => {
 
   const handleBack = () => {
     resetImage();
+    resetProcessing();
     navigate("/");
   };
 
@@ -57,7 +58,12 @@ const Controls = () => {
       setProcessedImage(processed);
     } catch (error) {
       console.error("Error processing image:", error);
-      addToast("Error processing image. Please try again.", "error");
+      addToast(
+        error instanceof Error
+          ? error.message
+          : "Error processing image. Please try again.",
+        "error"
+      );
       resetProcessing();
     }
   };
