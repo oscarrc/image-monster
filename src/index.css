@@ -5,6 +5,6 @@
 
 @layer utilities {
   .layout-grid {
-    grid-template-rows: 1fr 20fr 1fr;
+    grid-template-rows: 1fr 12fr 1fr;
   }
 }
