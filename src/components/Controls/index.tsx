@@ -22,7 +22,7 @@ const ModeInfo = {
   },
   [MODES.STYLE]: {
     label: "Style Transfer",
-    info: "This will apply an artistic style (Ghibli) to your image.",
+    info: "This will apply an artistic style to your image.",
     options: StyleOptions,
   },
 } as Record<

@@ -34,6 +34,11 @@ export const ImageProcessingContext = createContext<ImageProcessingContextType>(
       [MODES.BACKGROUND]: {
         threshold: 0.5,
         thresholdEnabled: false,
+        smoothingEnabled: true,
+        smoothingRadius: 3,
+        featherEnabled: false,
+        featherRadius: 5,
+        preserveEdges: true,
       },
       [MODES.ENHANCE]: {
         scale: 1.0,

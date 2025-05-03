@@ -25,6 +25,11 @@ const DEFAULT_OPTIONS: ProcessingOptions = {
   [MODES.BACKGROUND]: {
     threshold: 0.5,
     thresholdEnabled: false,
+    smoothingEnabled: true,
+    smoothingRadius: 3,
+    featherEnabled: false,
+    featherRadius: 5,
+    preserveEdges: true,
   },
   [MODES.ENHANCE]: {
     scale: 1.0,
@@ -103,12 +108,12 @@ export const ImageProcessingProvider = ({
 
       model.current = await AutoModel.from_pretrained(MODELS[mode], {
         device: "webgpu",
-        dtype: "q8",
+        dtype: "fp32",
         progress_callback: progresCallback,
       });
       processor.current = await AutoProcessor.from_pretrained(MODELS[mode], {
         device: "webgpu",
-        dtype: "q8",
+        dtype: "fp32",
       });
 
       if (mode === MODES.STYLE && !styleImage.current) {
@@ -134,11 +139,15 @@ export const ImageProcessingProvider = ({
     img: RawImage,
     options: ProcessingOptions[MODES.BACKGROUND]
   ) => {
-    const { pixel_values } = await processor.current!(img);
+    const targetSize = 512;
+    const resizedImage = await img.resize(targetSize, targetSize);
+
+    const { pixel_values } = await processor.current!(resizedImage);
     const { output } = await model.current!({
       input: pixel_values,
     });
 
+    // Process the mask with better quality
     const maskData = (
       await RawImage.fromTensor(output[0].mul(255).to("uint8")).resize(
         img.width,
@@ -146,14 +155,113 @@ export const ImageProcessingProvider = ({
       )
     ).data;
 
-    if (options.thresholdEnabled) {
-      for (let i = 0; i < maskData.length; ++i) {
-        // If thresholding is enabled:
-        if (maskData[i] / 255 < options.threshold) {
-          maskData[i] = 0;
-        } else {
-          maskData[i] = 255;
+    let processedMask = new Uint8Array(maskData);
+
+    // Apply smoothing if enabled
+    if (options.smoothingEnabled) {
+      const kernelSize = options.smoothingRadius * 2 + 1;
+      const halfKernel = Math.floor(kernelSize / 2);
+      const smoothedMask = new Uint8Array(maskData.length);
+
+      for (let y = 0; y < img.height; y++) {
+        for (let x = 0; x < img.width; x++) {
+          let sum = 0;
+          let count = 0;
+
+          for (let ky = -halfKernel; ky <= halfKernel; ky++) {
+            for (let kx = -halfKernel; kx <= halfKernel; kx++) {
+              const nx = x + kx;
+              const ny = y + ky;
+
+              if (nx >= 0 && nx < img.width && ny >= 0 && ny < img.height) {
+                sum += maskData[ny * img.width + nx];
+                count++;
+              }
+            }
+          }
+
+          smoothedMask[y * img.width + x] = Math.round(sum / count);
         }
+      }
+      processedMask = smoothedMask;
+    }
+
+    // Apply feathering if enabled
+    if (options.featherEnabled) {
+      const featherMask = new Uint8Array(processedMask.length);
+      const featherRadius = options.featherRadius;
+
+      for (let y = 0; y < img.height; y++) {
+        for (let x = 0; x < img.width; x++) {
+          let maxValue = 0;
+          let minValue = 255;
+
+          // Find min and max values in the neighborhood
+          for (let ky = -featherRadius; ky <= featherRadius; ky++) {
+            for (let kx = -featherRadius; kx <= featherRadius; kx++) {
+              const nx = x + kx;
+              const ny = y + ky;
+
+              if (nx >= 0 && nx < img.width && ny >= 0 && ny < img.height) {
+                const value = processedMask[ny * img.width + nx];
+                maxValue = Math.max(maxValue, value);
+                minValue = Math.min(minValue, value);
+              }
+            }
+          }
+
+          // Apply feathering based on the difference
+          const diff = maxValue - minValue;
+          if (diff > 0) {
+            const featherFactor = Math.min(1, diff / 255);
+            featherMask[y * img.width + x] = Math.round(
+              processedMask[y * img.width + x] * (1 - featherFactor * 0.5)
+            );
+          } else {
+            featherMask[y * img.width + x] = processedMask[y * img.width + x];
+          }
+        }
+      }
+      processedMask = featherMask;
+    }
+
+    // Apply threshold if enabled
+    if (options.thresholdEnabled) {
+      for (let i = 0; i < processedMask.length; ++i) {
+        if (processedMask[i] / 255 < options.threshold) {
+          processedMask[i] = 0;
+        } else {
+          processedMask[i] = 255;
+        }
+      }
+    }
+
+    // Preserve edges if enabled
+    if (options.preserveEdges) {
+      const edgeMask = new Uint8Array(processedMask.length);
+      const edgeKernel = [
+        [-1, -1, -1],
+        [-1, 8, -1],
+        [-1, -1, -1],
+      ];
+
+      for (let y = 1; y < img.height - 1; y++) {
+        for (let x = 1; x < img.width - 1; x++) {
+          let edgeValue = 0;
+          for (let ky = -1; ky <= 1; ky++) {
+            for (let kx = -1; kx <= 1; kx++) {
+              edgeValue +=
+                processedMask[(y + ky) * img.width + (x + kx)] *
+                edgeKernel[ky + 1][kx + 1];
+            }
+          }
+          edgeMask[y * img.width + x] = Math.min(255, Math.max(0, edgeValue));
+        }
+      }
+
+      // Combine edge mask with processed mask
+      for (let i = 0; i < processedMask.length; i++) {
+        processedMask[i] = Math.max(processedMask[i], edgeMask[i]);
       }
     }
 
@@ -165,8 +273,8 @@ export const ImageProcessingProvider = ({
     ctx!.drawImage(img.toCanvas(), 0, 0);
 
     const pixelData = ctx!.getImageData(0, 0, img.width, img.height);
-    for (let i = 0; i < maskData.length; ++i) {
-      pixelData.data[4 * i + 3] = maskData[i];
+    for (let i = 0; i < processedMask.length; ++i) {
+      pixelData.data[4 * i + 3] = processedMask[i];
     }
     ctx!.putImageData(pixelData, 0, 0);
 
