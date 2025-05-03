@@ -4,7 +4,7 @@
 
 A free online AI-powered background removal tool.
 
-![ImageMonster](https://github.com/oscarrc/image-monster/blob/master/public/screenshot-wide.png?raw=true "ImageMonster AI Background Remover")
+![ImageMonster](https://raw.githubusercontent.com/oscarrc/image-monster/refs/heads/main/public/screenshot-wide.png "ImageMonster AI Background Remover")
 
 <table>
   <tr>
