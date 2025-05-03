@@ -13,13 +13,13 @@ const ProcessView = () => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
-      className="w-full h-full flex flex-col py-8"
+      className="w-full h-full flex flex-col pb-8"
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1 overflow-hidden">
-        <div className="h-full overflow-auto">
+        <div className="h-full min-h-[50dvh] overflow-auto">
           {processedImage ? <ResultDiffPreview /> : <ImagePreview />}
         </div>
-        <div className="h-full overflow-auto">
+        <div className="h-full min-h-[50dvh] overflow-auto">
           <Controls />
         </div>
       </div>
