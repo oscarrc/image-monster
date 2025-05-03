@@ -9,7 +9,7 @@ A free online AI-powered background removal tool.
 <table>
   <tr>
     <td align="center">
-      <a href="https://image-monster.oscarrc.me" target="_BLANK">
+      <a href="https://imagemonster.oscarrc.me" target="_BLANK">
       <img width="175" src="https://user-images.githubusercontent.com/3104648/28969264-d14f6178-791b-11e7-9399-e7820d6aaa39.png" alt="PWA"></a>
     </td>
   </tr>
@@ -34,7 +34,7 @@ If you miss any feature, please, request it.
 
 ### How it works
 
-1. Go to the [ImageMonster page](https://image-monster.oscarrc.me)
+1. Go to the [ImageMonster page](https://imagemonster.oscarrc.me)
 2. Drag and drop or select images to upload
 3. Wait for the AI to process your images
 4. Download your images with transparent backgrounds

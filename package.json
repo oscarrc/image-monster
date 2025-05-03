@@ -6,7 +6,7 @@
   "description": "ImageMonster is a web application that allows you to remove image backgrounds using ai models.",
   "author": "Oscar R.C.",
   "license": "MIT",
-  "homepage": "https://image-monster.oscarrc.me",
+  "homepage": "https://imagemonster.oscarrc.me",
   "repository": {
     "type": "git",
     "url": "https://github.com/oscarrc/image-monster.git"
@@ -23,7 +23,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "deploy": "surge --project dist --domain image-monster.oscarrc.me",
+    "deploy": "surge --project dist --domain imagemonster.oscarrc.me",
     "predeploy": "npm run build && cp dist/index.html dist/200.html && cp dist/index.html dist/404.html"
   },
   "dependencies": {
