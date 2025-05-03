@@ -7,8 +7,19 @@ import {
   RawImage,
   env,
 } from "@huggingface/transformers";
-import { Options, ProcessedImage, DEFAULT_OPTIONS } from "../../types/imageProcessing";
-import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import {
+  DEFAULT_OPTIONS,
+  Options,
+  ProcessedImage,
+} from "../../types/imageProcessing";
+import {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { ImageProcessingContext } from ".";
 
@@ -33,6 +44,11 @@ export const ImageProcessingProvider = ({
 
   const model = useRef<PreTrainedModel | null>(null);
   const processor = useRef<Processor | null>(null);
+
+  const hasProcessedImages = useMemo(
+    () => images.some((img) => img.processedUrl !== null),
+    [images]
+  );
 
   const progresCallback = useCallback((p: ProgressInfo) => {
     const { status } = p;
@@ -102,10 +118,7 @@ export const ImageProcessingProvider = ({
     }
   }, [cleanup, progresCallback]);
 
-  const removeBackground = async (
-    img: RawImage,
-    optionsToUse: Options
-  ) => {
+  const removeBackground = async (img: RawImage, optionsToUse: Options) => {
     const targetSize = 512;
     const resizedImage = await img.resize(targetSize, targetSize);
 
@@ -309,20 +322,16 @@ export const ImageProcessingProvider = ({
       }
 
       const processedUrl = await removeBackground(img, options);
-      
+
       setImages((prev) =>
         prev.map((img) =>
-          img.id === id
-            ? { ...img, processedUrl, status: "completed" }
-            : img
+          img.id === id ? { ...img, processedUrl, status: "completed" } : img
         )
       );
     } catch (error) {
       console.error("Error processing image:", error);
       setImages((prev) =>
-        prev.map((img) =>
-          img.id === id ? { ...img, status: "error" } : img
-        )
+        prev.map((img) => (img.id === id ? { ...img, status: "error" } : img))
       );
     }
   };
@@ -375,13 +384,14 @@ export const ImageProcessingProvider = ({
     modelLoading,
     loadingProgress,
     options,
+    hasProcessedImages,
     setImage,
     setProcessedImage,
     processImage,
     resetImage,
     resetProcessing,
     updateOptions,
-    
+
     images,
     addImages,
     processAllImages,

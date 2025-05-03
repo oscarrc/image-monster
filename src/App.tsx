@@ -1,19 +1,72 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
+import { BsCloudDownload } from "react-icons/bs";
+import { CiPlay1 } from "react-icons/ci";
 import { ImageList } from "./components/ImageList";
+import JSZip from "jszip";
 import Layout from "./components/layout";
+import { ProcessedImage } from "./types/imageProcessing";
 import Uploader from "./components/Uploader";
+import { saveAs } from "file-saver";
 import { useImageProcessing } from "./contexts/ImageProcessingContext/useImageProcessing";
 
 const App = () => {
-  const { images, processAllImages, isProcessing } = useImageProcessing();
-  const [hasImages, setHasImages] = useState(false);
+  const { images, processAllImages, isProcessing, hasProcessedImages } =
+    useImageProcessing();
 
-  // Update hasImages state when images array changes
-  useEffect(() => {
-    setHasImages(images.length > 0);
-  }, [images]);
+  const hasImages = images.length > 0;
+
+  const downloadImages = () => {
+    // Check if there are processed images
+    const processedImages = images.filter(
+      (img): img is ProcessedImage & { processedUrl: string } =>
+        img.status === "completed" && img.processedUrl !== null
+    );
+
+    if (processedImages.length === 0) {
+      // If no processed images, show an alert
+      alert("No processed images to download. Please process images first.");
+      return;
+    }
+
+    // If there's only one image, download it directly
+    if (processedImages.length === 1) {
+      const image = processedImages[0];
+      const filename = `${image.name.split(".")[0]}_nobg.png`;
+      
+      fetch(image.processedUrl)
+        .then(response => response.blob())
+        .then(blob => {
+          saveAs(blob, filename);
+        });
+      return;
+    }
+
+    // Otherwise create a zip with all images
+    const zip = new JSZip();
+    const promises: Promise<void>[] = [];
+
+    // Add each processed image to the zip
+    processedImages.forEach((image) => {
+      const promise = fetch(image.processedUrl)
+        .then((response) => response.blob())
+        .then((blob) => {
+          // Use the original filename but add _nobg.png
+          const filename = `${image.name.split(".")[0]}_nobg.png`;
+          zip.file(filename, blob);
+        });
+
+      promises.push(promise);
+    });
+
+    // When all images are added to the zip, generate and download it
+    Promise.all(promises).then(() => {
+      zip.generateAsync({ type: "blob" }).then((content) => {
+        saveAs(content, "image-monster-processed.zip");
+      });
+    });
+  };
 
   return (
     <Layout>
@@ -85,37 +138,38 @@ const App = () => {
           )}
         </AnimatePresence>
 
-        {hasImages && (
-          <motion.button
-            className="btn btn-primary fixed bottom-15 right-6 z-50 btn-circle w-10 h-10 md:w-14 md:h-14 shadow-lg"
-            onClick={processAllImages}
-            disabled={isProcessing}
-            initial={{ opacity: 0, y: "1.25rem" }}
-            animate={{ opacity: 1, y: 0 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            {isProcessing ? (
-              <span className="loading loading-spinner"></span>
-            ) : (
-              <svg
-                className="w-5 h-5 md:w-6 md:h-6"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-              >
-                <g
-                  strokeLinejoin="round"
-                  strokeLinecap="round"
-                  strokeWidth="2"
-                  fill="none"
-                  stroke="currentColor"
-                >
-                  <path d="M6 3L20 12 6 21 6 3z"></path>
-                </g>
-              </svg>
-            )}
-          </motion.button>
-        )}
+        <div className="fixed bottom-15 right-6 z-50 flex flex-col items-center gap-2">
+          {hasProcessedImages && !isProcessing && (
+            <motion.button
+              className="btn btn-primary btn-outline btn-md btn-circle shadow-lg"
+              onClick={downloadImages}
+              initial={{ opacity: 0, y: "1.25rem" }}
+              animate={{ opacity: 1, y: 0 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <BsCloudDownload className="h-5 w-5" />
+            </motion.button>
+          )}
+
+          {hasImages && (
+            <motion.button
+              className="btn btn-primary btn-circle btn-lg shadow-lg"
+              onClick={processAllImages}
+              disabled={isProcessing}
+              initial={{ opacity: 0, y: "1.25rem" }}
+              animate={{ opacity: 1, y: 0 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {isProcessing ? (
+                <span className="loading loading-spinner"></span>
+              ) : (
+                <CiPlay1 className="h-6 w-6" />
+              )}
+            </motion.button>
+          )}
+        </div>
       </div>
     </Layout>
   );

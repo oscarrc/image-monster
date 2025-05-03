@@ -1,4 +1,5 @@
 import { Options, ProcessedImage } from "../../types/imageProcessing";
+
 import { createContext } from "react";
 
 export interface ImageProcessingContextType {
@@ -7,6 +8,7 @@ export interface ImageProcessingContextType {
   isProcessing: boolean;
   modelLoading: boolean;
   loadingProgress: number;
+  hasProcessedImages: boolean;
   options: Options;
   setImage: (image: string | null) => void;
   setProcessedImage: (image: string | null) => void;
@@ -14,7 +16,7 @@ export interface ImageProcessingContextType {
   resetImage: () => void;
   resetProcessing: () => void;
   updateOptions: (newOptions: Partial<Options>) => void;
-  
+
   images: ProcessedImage[];
   addImages: (files: FileList) => void;
   processAllImages: () => Promise<void>;
@@ -23,32 +25,35 @@ export interface ImageProcessingContextType {
   removeImage: (id: string) => void;
 }
 
-export const ImageProcessingContext = createContext<ImageProcessingContextType>({
-  image: null,
-  processedImage: null,
-  isProcessing: false,
-  modelLoading: false,
-  loadingProgress: 0,
-  options: {
-    threshold: 0.5,
-    thresholdEnabled: false,
-    smoothingEnabled: false,
-    smoothingRadius: 3,
-    featherEnabled: false,
-    featherRadius: 5,
-    preserveEdges: false,
-  },
-  setImage: () => {},
-  setProcessedImage: () => {},
-  processImage: async () => "",
-  resetImage: () => {},
-  resetProcessing: () => {},
-  updateOptions: () => {},
-  
-  images: [],
-  addImages: () => {},
-  processAllImages: async () => {},
-  processImageById: async () => {},
-  updateImageOptions: () => {},
-  removeImage: () => {},
-});
+export const ImageProcessingContext = createContext<ImageProcessingContextType>(
+  {
+    image: null,
+    processedImage: null,
+    isProcessing: false,
+    modelLoading: false,
+    loadingProgress: 0,
+    hasProcessedImages: false,
+    options: {
+      threshold: 0.5,
+      thresholdEnabled: false,
+      smoothingEnabled: false,
+      smoothingRadius: 3,
+      featherEnabled: false,
+      featherRadius: 5,
+      preserveEdges: false,
+    },
+    setImage: () => {},
+    setProcessedImage: () => {},
+    processImage: async () => "",
+    resetImage: () => {},
+    resetProcessing: () => {},
+    updateOptions: () => {},
+
+    images: [],
+    addImages: () => {},
+    processAllImages: async () => {},
+    processImageById: async () => {},
+    updateImageOptions: () => {},
+    removeImage: () => {},
+  }
+);
