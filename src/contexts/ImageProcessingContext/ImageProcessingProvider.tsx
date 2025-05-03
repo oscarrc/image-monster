@@ -7,7 +7,7 @@ import {
   RawImage,
   env,
 } from "@huggingface/transformers";
-import { MODES, ProcessingOptions } from "../../types/imageProcessing";
+import { Options, ProcessedImage, DEFAULT_OPTIONS } from "../../types/imageProcessing";
 import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 
 import { ImageProcessingContext } from ".";
@@ -15,34 +15,7 @@ import { ImageProcessingContext } from ".";
 env.allowLocalModels = false;
 env.useBrowserCache = true;
 
-const MODELS = {
-  [MODES.BACKGROUND]: "Xenova/modnet",
-  [MODES.ENHANCE]: "Xenova/swin2SR-realworld-sr-x4-64-bsrgan-psnr",
-  [MODES.STYLE]: "Xenova/stable-diffusion-v1-5",
-};
-
-const DEFAULT_OPTIONS: ProcessingOptions = {
-  [MODES.BACKGROUND]: {
-    threshold: 0.5,
-    thresholdEnabled: false,
-    smoothingEnabled: false,
-    smoothingRadius: 3,
-    featherEnabled: false,
-    featherRadius: 5,
-    preserveEdges: false,
-  },
-  [MODES.ENHANCE]: {
-    scale: 1.0,
-    zoomEnabled: false,
-    zoomLevel: 50,
-  },
-  [MODES.STYLE]: {
-    styleStrength: 0.5,
-    numInferenceSteps: 20,
-    guidanceScale: 7.5,
-    style: "ghibli.png",
-  },
-};
+const MODEL = "Xenova/modnet";
 
 export const ImageProcessingProvider = ({
   children,
@@ -51,17 +24,17 @@ export const ImageProcessingProvider = ({
 }) => {
   const [image, setImage] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
-  const [mode, setMode] = useState<MODES>(MODES.BACKGROUND);
   const [isProcessing, setIsProcessing] = useState(false);
   const [modelLoading, setModelLoading] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
-  const [options, setOptions] = useState<ProcessingOptions>(DEFAULT_OPTIONS);
+  const [options, setOptions] = useState<Options>(DEFAULT_OPTIONS);
+
+  const [images, setImages] = useState<ProcessedImage[]>([]);
 
   const model = useRef<PreTrainedModel | null>(null);
   const processor = useRef<Processor | null>(null);
-  const styleImage = useRef<RawImage | null>(null);
 
-  const progresCallback = (p: ProgressInfo) => {
+  const progresCallback = useCallback((p: ProgressInfo) => {
     const { status } = p;
 
     switch (status) {
@@ -78,7 +51,7 @@ export const ImageProcessingProvider = ({
       default:
         break;
     }
-  };
+  }, []);
 
   // Cleanup function to dispose of WebGPU resources
   const cleanup = useCallback(() => {
@@ -97,7 +70,6 @@ export const ImageProcessingProvider = ({
         console.error("Error disposing processor:", error);
       }
     }
-    styleImage.current = null;
   }, []);
 
   // Cleanup on unmount
@@ -115,21 +87,10 @@ export const ImageProcessingProvider = ({
       // Add a small delay to ensure cleanup is complete
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      model.current = await AutoModel.from_pretrained(MODELS[mode], {
+      model.current = await AutoModel.from_pretrained(MODEL, {
         progress_callback: progresCallback,
       });
-      processor.current = await AutoProcessor.from_pretrained(MODELS[mode], {});
-
-      if (mode === MODES.STYLE && !styleImage.current) {
-        try {
-          styleImage.current = await RawImage.fromURL(
-            "/assets/styles/ghibbli.png"
-          );
-        } catch (error) {
-          console.error("Error loading style image:", error);
-          throw new Error("Failed to load style image");
-        }
-      }
+      processor.current = await AutoProcessor.from_pretrained(MODEL, {});
     } catch (error) {
       console.error("Error loading model:", error);
       if (error instanceof Error && error.name === "AbortError") {
@@ -139,11 +100,11 @@ export const ImageProcessingProvider = ({
       }
       throw new Error("Failed to load AI model");
     }
-  }, [mode, cleanup]);
+  }, [cleanup, progresCallback]);
 
   const removeBackground = async (
     img: RawImage,
-    options: ProcessingOptions[MODES.BACKGROUND]
+    optionsToUse: Options
   ) => {
     const targetSize = 512;
     const resizedImage = await img.resize(targetSize, targetSize);
@@ -164,8 +125,8 @@ export const ImageProcessingProvider = ({
     let processedMask = new Uint8Array(maskData);
 
     // Apply smoothing if enabled
-    if (options.smoothingEnabled) {
-      const kernelSize = options.smoothingRadius * 2 + 1;
+    if (optionsToUse.smoothingEnabled) {
+      const kernelSize = optionsToUse.smoothingRadius * 2 + 1;
       const halfKernel = Math.floor(kernelSize / 2);
       const smoothedMask = new Uint8Array(maskData.length);
 
@@ -193,9 +154,9 @@ export const ImageProcessingProvider = ({
     }
 
     // Apply feathering if enabled
-    if (options.featherEnabled) {
+    if (optionsToUse.featherEnabled) {
       const featherMask = new Uint8Array(processedMask.length);
-      const featherRadius = options.featherRadius;
+      const featherRadius = optionsToUse.featherRadius;
 
       for (let y = 0; y < img.height; y++) {
         for (let x = 0; x < img.width; x++) {
@@ -232,9 +193,9 @@ export const ImageProcessingProvider = ({
     }
 
     // Apply threshold if enabled
-    if (options.thresholdEnabled) {
+    if (optionsToUse.thresholdEnabled) {
       for (let i = 0; i < processedMask.length; ++i) {
-        if (processedMask[i] / 255 < options.threshold) {
+        if (processedMask[i] / 255 < optionsToUse.threshold) {
           processedMask[i] = 0;
         } else {
           processedMask[i] = 255;
@@ -243,7 +204,7 @@ export const ImageProcessingProvider = ({
     }
 
     // Preserve edges if enabled
-    if (options.preserveEdges) {
+    if (optionsToUse.preserveEdges) {
       const edgeMask = new Uint8Array(processedMask.length);
       const edgeKernel = [
         [-1, -1, -1],
@@ -287,148 +248,8 @@ export const ImageProcessingProvider = ({
     return canvas.toDataURL("image/png", 1.0);
   };
 
-  const enhanceImage = async (
-    img: RawImage,
-    options: ProcessingOptions[MODES.ENHANCE]
-  ) => {
-    let processedImg = img;
-
-    // Apply zoom if enabled
-    if (options.zoomEnabled) {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-
-      canvas.width = img.width;
-      canvas.height = img.height;
-
-      const zoomFactor = options.zoomLevel / 100;
-      const cropWidth = img.width * zoomFactor;
-      const cropHeight = img.height * zoomFactor;
-      const cropX = (img.width - cropWidth) / 2;
-      const cropY = (img.height - cropHeight) / 2;
-
-      ctx!.drawImage(
-        img.toCanvas(),
-        cropX,
-        cropY,
-        cropWidth,
-        cropHeight,
-        0,
-        0,
-        canvas.width,
-        canvas.height
-      );
-
-      processedImg = await RawImage.fromCanvas(canvas);
-    }
-
-    // Calculate maximum dimensions to prevent memory issues
-    const MAX_DIMENSION = 512;
-    const scale = Math.min(
-      1,
-      MAX_DIMENSION / Math.max(processedImg.width, processedImg.height)
-    );
-
-    // Resize the image if it's too large
-    if (scale < 1) {
-      const newWidth = Math.round(processedImg.width * scale);
-      const newHeight = Math.round(processedImg.height * scale);
-      processedImg = await processedImg.resize(newWidth, newHeight);
-    }
-
-    try {
-      if (!model.current || !processor.current) {
-        throw new Error("Model or processor not loaded");
-      }
-
-      // Process the image with the model
-      const processed = await processor.current(processedImg);
-
-      // Add a check for the output dimensions
-      const inputHeight = processed.pixel_values.dims[2];
-      const inputWidth = processed.pixel_values.dims[3];
-      const outputHeight = inputHeight * options.scale;
-      const outputWidth = inputWidth * options.scale;
-
-      if (outputHeight > 1024 || outputWidth > 1024) {
-        throw new Error(
-          "Image dimensions after upscaling would be too large. Please try with a smaller image or reduce the zoom level."
-        );
-      }
-
-      const { reconstruction } = await model.current({
-        pixel_values: processed.pixel_values,
-      });
-
-      // The new model outputs a 4x upscaled image
-      const enhancedImage = await RawImage.fromTensor(
-        reconstruction[0].mul(255).clamp(0, 255).to("uint8")
-      );
-
-      const canvas = document.createElement("canvas");
-      canvas.width = enhancedImage.width;
-      canvas.height = enhancedImage.height;
-      const ctx = canvas.getContext("2d");
-
-      ctx!.drawImage(enhancedImage.toCanvas(), 0, 0);
-
-      return canvas.toDataURL("image/png", 1.0);
-    } catch (error) {
-      console.error("Error in enhanceImage:", error);
-      if (error instanceof Error) {
-        if (error.message.includes("WebGPU")) {
-          console.error("WebGPU error details:", error);
-          throw new Error(
-            "Image is too large to process. Please try with a smaller image or reduce the zoom level."
-          );
-        }
-        if (error.message.includes("dimensions after upscaling")) {
-          console.error("Dimension error details:", error);
-          throw error;
-        }
-      }
-      console.error("Unexpected error in enhanceImage:", error);
-      throw new Error(
-        "Failed to process image. Please try again with a smaller image."
-      );
-    }
-  };
-
-  const transferStyle = async (
-    img: RawImage,
-    options: ProcessingOptions[MODES.STYLE]
-  ) => {
-    if (!styleImage.current) {
-      throw new Error("Style image not loaded");
-    }
-
-    const contentImage = await processor.current!(img);
-    const styleImageProcessed = await processor.current!(styleImage.current);
-
-    const { output } = await model.current!({
-      prompt: "ghibli style",
-      image: contentImage.pixel_values,
-      style_image: styleImageProcessed.pixel_values,
-      num_inference_steps: options.numInferenceSteps,
-      guidance_scale: options.guidanceScale,
-      style_strength: options.styleStrength,
-    });
-
-    const styledImage = await RawImage.fromTensor(
-      output[0].mul(255).clamp(0, 255).to("uint8")
-    );
-    const canvas = document.createElement("canvas");
-    canvas.width = styledImage.width;
-    canvas.height = styledImage.height;
-    const ctx = canvas.getContext("2d");
-
-    ctx!.drawImage(styledImage.toCanvas(), 0, 0);
-
-    return canvas.toDataURL("image/png", 1.0);
-  };
-
-  const processImage = async (processingMode: string, image: string | URL) => {
-    if (!image) {
+  const processImage = async (imageUrl: string | URL) => {
+    if (!imageUrl) {
       throw new Error("No image provided");
     }
 
@@ -438,45 +259,94 @@ export const ImageProcessingProvider = ({
 
       let img: RawImage;
       try {
-        img = await RawImage.fromURL(image);
+        img = await RawImage.fromURL(imageUrl);
       } catch (error) {
         console.error("Error loading image:", error);
         throw new Error("Failed to load image");
       }
 
-      let processedImage: string = "";
-
-      try {
-        switch (processingMode) {
-          case MODES.BACKGROUND:
-            processedImage = await removeBackground(
-              img,
-              options[MODES.BACKGROUND]
-            );
-            break;
-          case MODES.ENHANCE:
-            processedImage = await enhanceImage(img, options[MODES.ENHANCE]);
-            break;
-          case MODES.STYLE:
-            processedImage = await transferStyle(img, options[MODES.STYLE]);
-            break;
-          default:
-            throw new Error("Invalid processing mode");
-        }
-      } catch (error) {
-        console.error("Error in processImage:", error);
-        if (error instanceof Error && error.name === "AbortError") {
-          throw new Error(
-            "GPU resources are no longer available. Please refresh the page and try again."
-          );
-        }
-        throw error;
-      }
-
+      const processedImage = await removeBackground(img, options);
       return processedImage;
+    } catch (error) {
+      console.error("Error in processImage:", error);
+      throw error;
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const addImages = (files: FileList) => {
+    const newImages: ProcessedImage[] = Array.from(files).map((file) => ({
+      id: crypto.randomUUID(),
+      originalUrl: URL.createObjectURL(file),
+      processedUrl: null,
+      status: "pending",
+      name: file.name,
+    }));
+
+    setImages((prev) => [...prev, ...newImages]);
+  };
+
+  const processImageById = async (id: string) => {
+    const image = images.find((img) => img.id === id);
+    if (!image) return;
+
+    setImages((prev) =>
+      prev.map((img) =>
+        img.id === id ? { ...img, status: "processing" } : img
+      )
+    );
+
+    try {
+      await loadModel();
+
+      let img: RawImage;
+      try {
+        img = await RawImage.fromURL(image.originalUrl);
+      } catch (error) {
+        console.error("Error loading image:", error);
+        throw new Error("Failed to load image");
+      }
+
+      const processedUrl = await removeBackground(img, options);
+      
+      setImages((prev) =>
+        prev.map((img) =>
+          img.id === id
+            ? { ...img, processedUrl, status: "completed" }
+            : img
+        )
+      );
+    } catch (error) {
+      console.error("Error processing image:", error);
+      setImages((prev) =>
+        prev.map((img) =>
+          img.id === id ? { ...img, status: "error" } : img
+        )
+      );
+    }
+  };
+
+  const processAllImages = async () => {
+    setIsProcessing(true);
+    try {
+      for (const image of images) {
+        if (image.status === "pending" || image.status === "error") {
+          await processImageById(image.id);
+        }
+      }
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const updateImageOptions = (id: string, newOptions: Partial<Options>) => {
+    // Update global options for all images
+    updateOptions(newOptions);
+  };
+
+  const removeImage = (id: string) => {
+    setImages((prev) => prev.filter((img) => img.id !== id));
   };
 
   const resetImage = () => {
@@ -491,34 +361,33 @@ export const ImageProcessingProvider = ({
     setProcessedImage(null);
   };
 
-  const updateOptions = (
-    mode: MODES,
-    newOptions: Partial<ProcessingOptions[MODES]>
-  ) => {
+  const updateOptions = (newOptions: Partial<Options>) => {
     setOptions((prev) => ({
       ...prev,
-      [mode]: {
-        ...prev[mode],
-        ...newOptions,
-      },
+      ...newOptions,
     }));
   };
 
   const value = {
     image,
     processedImage,
-    mode,
     isProcessing,
     modelLoading,
     loadingProgress,
     options,
     setImage,
     setProcessedImage,
-    setMode,
     processImage,
     resetImage,
     resetProcessing,
     updateOptions,
+    
+    images,
+    addImages,
+    processAllImages,
+    processImageById,
+    updateImageOptions,
+    removeImage,
   };
 
   return (

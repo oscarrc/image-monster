@@ -25,14 +25,14 @@ const Header = () => {
 
   return (
     <motion.header
-      className={`sticky top-0 z-50 transition-all duration-300 h-16 ${
+      className={`sticky top-0 z-50 transition-all duration-300 ${
         scrolled ? "bg-base-100 shadow-md" : "bg-base-100/80 backdrop-blur-sm"
       }`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <nav className="navbar container mx-auto px-4 h-full">
+      <nav className="navbar container mx-auto px-4 h-16">
         <div className="flex-1">
           <Link to="/">
             <div className="flex gap-2 items-center text-2xl text-primary">

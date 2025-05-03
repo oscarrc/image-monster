@@ -5,14 +5,14 @@ import { motion } from "framer-motion";
 
 const Layout = ({ children }: { children?: ReactNode }) => {
   return (
-    <div className="grid grid-rows-3 layout-grid min-h-screen max-h-auto md:max-h-screen bg-base-100">
+    <div className="grid grid-rows-[auto_1fr_auto] layout-grid min-h-screen max-h-auto md:max-h-screen bg-base-100">
       <Header />
 
       <motion.main
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4 }}
-        className="flex-1 container mx-auto px-4 overflow-hidden"
+        className="flex-1 container mx-auto px-4 overflow-hidden flex pt-4"
       >
         {children}
       </motion.main>
