@@ -3,11 +3,12 @@ import { FiArrowLeft, FiInfo } from "react-icons/fi";
 import BackgroundOptions from "./BackgroundOptions";
 import EnhanceOptions from "./EnhanceOptions";
 import { MODES } from "@/types/imageProcessing";
-import StyleOptions from "./StyleOptions";
 import { motion } from "framer-motion";
 import { useImageProcessing } from "@/contexts/ImageProcessingContext/useImageProcessing";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/contexts/ToastContext/useToast";
+
+// import StyleOptions from "./StyleOptions";
 
 const ModeInfo = {
   [MODES.BACKGROUND]: {
@@ -22,8 +23,9 @@ const ModeInfo = {
   },
   [MODES.STYLE]: {
     label: "Style Transfer",
-    info: "This will apply an artistic style to your image.",
-    options: StyleOptions,
+    info: "Coming soon! This will apply a style transfer to your image.",
+    // options: StyleOptions,
+    options: () => <div></div>,
   },
 } as Record<
   string,
@@ -115,7 +117,7 @@ const Controls = () => {
           {!processedImage ? (
             <button
               className="btn btn-primary btn-block"
-              disabled={isProcessing}
+              disabled={isProcessing || mode === MODES.STYLE}
               onClick={handleProcessing}
             >
               {isProcessing && (

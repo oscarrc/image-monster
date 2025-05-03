@@ -17,7 +17,7 @@ env.useBrowserCache = true;
 
 const MODELS = {
   [MODES.BACKGROUND]: "Xenova/modnet",
-  [MODES.ENHANCE]: "Xenova/swin2SR-classical-sr-x2-64",
+  [MODES.ENHANCE]: "Xenova/swin2SR-realworld-sr-x4-64-bsrgan-psnr",
   [MODES.STYLE]: "Xenova/stable-diffusion-v1-5",
 };
 
@@ -25,11 +25,11 @@ const DEFAULT_OPTIONS: ProcessingOptions = {
   [MODES.BACKGROUND]: {
     threshold: 0.5,
     thresholdEnabled: false,
-    smoothingEnabled: true,
+    smoothingEnabled: false,
     smoothingRadius: 3,
     featherEnabled: false,
     featherRadius: 5,
-    preserveEdges: true,
+    preserveEdges: false,
   },
   [MODES.ENHANCE]: {
     scale: 1.0,
@@ -90,7 +90,13 @@ export const ImageProcessingProvider = ({
         console.error("Error disposing model:", error);
       }
     }
-    processor.current = null;
+    if (processor.current) {
+      try {
+        processor.current = null;
+      } catch (error) {
+        console.error("Error disposing processor:", error);
+      }
+    }
     styleImage.current = null;
   }, []);
 
@@ -106,26 +112,26 @@ export const ImageProcessingProvider = ({
       // Cleanup existing resources before loading new ones
       cleanup();
 
+      // Add a small delay to ensure cleanup is complete
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
       model.current = await AutoModel.from_pretrained(MODELS[mode], {
-        device: "webgpu",
-        dtype: "fp32",
         progress_callback: progresCallback,
       });
-      processor.current = await AutoProcessor.from_pretrained(MODELS[mode], {
-        device: "webgpu",
-        dtype: "fp32",
-      });
+      processor.current = await AutoProcessor.from_pretrained(MODELS[mode], {});
 
       if (mode === MODES.STYLE && !styleImage.current) {
         try {
           styleImage.current = await RawImage.fromURL(
             "/assets/styles/ghibbli.png"
           );
-        } catch {
+        } catch (error) {
+          console.error("Error loading style image:", error);
           throw new Error("Failed to load style image");
         }
       }
     } catch (error) {
+      console.error("Error loading model:", error);
       if (error instanceof Error && error.name === "AbortError") {
         throw new Error(
           "GPU resources are no longer available. Please refresh the page and try again."
@@ -316,46 +322,76 @@ export const ImageProcessingProvider = ({
       processedImg = await RawImage.fromCanvas(canvas);
     }
 
-    const processed = await processor.current!(processedImg);
-    const { reconstruction } = await model.current!({
-      pixel_values: processed.pixel_values,
-    });
+    // Calculate maximum dimensions to prevent memory issues
+    const MAX_DIMENSION = 512;
+    const scale = Math.min(
+      1,
+      MAX_DIMENSION / Math.max(processedImg.width, processedImg.height)
+    );
 
-    const enhancedImage = await RawImage.fromTensor(
-      reconstruction[0].mul(255).to("uint8")
-    ).resize(img.width, img.height);
+    // Resize the image if it's too large
+    if (scale < 1) {
+      const newWidth = Math.round(processedImg.width * scale);
+      const newHeight = Math.round(processedImg.height * scale);
+      processedImg = await processedImg.resize(newWidth, newHeight);
+    }
 
-    // Apply scaling if needed
-    if (options.scale !== 1.0) {
-      const scaledCanvas = document.createElement("canvas");
-      const scaledCtx = scaledCanvas.getContext("2d");
+    try {
+      if (!model.current || !processor.current) {
+        throw new Error("Model or processor not loaded");
+      }
 
-      scaledCanvas.width = enhancedImage.width * options.scale;
-      scaledCanvas.height = enhancedImage.height * options.scale;
+      // Process the image with the model
+      const processed = await processor.current(processedImg);
 
-      if (scaledCtx) {
-        scaledCtx.imageSmoothingEnabled = true;
-        scaledCtx.imageSmoothingQuality = "high";
-        scaledCtx.drawImage(
-          enhancedImage.toCanvas(),
-          0,
-          0,
-          scaledCanvas.width,
-          scaledCanvas.height
+      // Add a check for the output dimensions
+      const inputHeight = processed.pixel_values.dims[2];
+      const inputWidth = processed.pixel_values.dims[3];
+      const outputHeight = inputHeight * options.scale;
+      const outputWidth = inputWidth * options.scale;
+
+      if (outputHeight > 1024 || outputWidth > 1024) {
+        throw new Error(
+          "Image dimensions after upscaling would be too large. Please try with a smaller image or reduce the zoom level."
         );
       }
 
-      return scaledCanvas.toDataURL("image/png", 1.0);
+      const { reconstruction } = await model.current({
+        pixel_values: processed.pixel_values,
+      });
+
+      // The new model outputs a 4x upscaled image
+      const enhancedImage = await RawImage.fromTensor(
+        reconstruction[0].mul(255).clamp(0, 255).to("uint8")
+      );
+
+      const canvas = document.createElement("canvas");
+      canvas.width = enhancedImage.width;
+      canvas.height = enhancedImage.height;
+      const ctx = canvas.getContext("2d");
+
+      ctx!.drawImage(enhancedImage.toCanvas(), 0, 0);
+
+      return canvas.toDataURL("image/png", 1.0);
+    } catch (error) {
+      console.error("Error in enhanceImage:", error);
+      if (error instanceof Error) {
+        if (error.message.includes("WebGPU")) {
+          console.error("WebGPU error details:", error);
+          throw new Error(
+            "Image is too large to process. Please try with a smaller image or reduce the zoom level."
+          );
+        }
+        if (error.message.includes("dimensions after upscaling")) {
+          console.error("Dimension error details:", error);
+          throw error;
+        }
+      }
+      console.error("Unexpected error in enhanceImage:", error);
+      throw new Error(
+        "Failed to process image. Please try again with a smaller image."
+      );
     }
-
-    const canvas = document.createElement("canvas");
-    canvas.width = enhancedImage.width;
-    canvas.height = enhancedImage.height;
-    const ctx = canvas.getContext("2d");
-
-    ctx!.drawImage(enhancedImage.toCanvas(), 0, 0);
-
-    return canvas.toDataURL("image/png", 1.0);
   };
 
   const transferStyle = async (
@@ -403,7 +439,8 @@ export const ImageProcessingProvider = ({
       let img: RawImage;
       try {
         img = await RawImage.fromURL(image);
-      } catch {
+      } catch (error) {
+        console.error("Error loading image:", error);
         throw new Error("Failed to load image");
       }
 
@@ -427,6 +464,7 @@ export const ImageProcessingProvider = ({
             throw new Error("Invalid processing mode");
         }
       } catch (error) {
+        console.error("Error in processImage:", error);
         if (error instanceof Error && error.name === "AbortError") {
           throw new Error(
             "GPU resources are no longer available. Please refresh the page and try again."
