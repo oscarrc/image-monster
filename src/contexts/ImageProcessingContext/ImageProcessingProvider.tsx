@@ -24,7 +24,7 @@ const MODELS = {
 const DEFAULT_OPTIONS: ProcessingOptions = {
   [MODES.BACKGROUND]: {
     threshold: 0.5,
-    thresholdEnabled: true,
+    thresholdEnabled: false,
   },
   [MODES.ENHANCE]: {
     scale: 1.0,
