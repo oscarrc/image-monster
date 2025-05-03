@@ -41,6 +41,13 @@ export const ImageList = () => {
     setPreviewImage(null);
   };
 
+  const statusClass = {
+    pending: "text-base-content/70",
+    processing: "text-secondary/70",
+    completed: "text-primary/70",
+    error: "text-error/70",
+  };
+
   return (
     <>
       <ul className="list bg-base-200 rounded-box shadow-md w-full">
@@ -70,7 +77,11 @@ export const ImageList = () => {
                 <div className="font-medium truncate max-w-[200px]">
                   {image.name}
                 </div>
-                <div className="text-xs uppercase font-semibold opacity-60">
+                <div
+                  className={`text-xs uppercase font-semibold ${
+                    statusClass[image.status]
+                  }`}
+                >
                   {image.status}
                 </div>
               </div>
