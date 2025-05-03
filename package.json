@@ -1,8 +1,23 @@
 {
   "name": "image-monster",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "description": "ImageMonster is a web application that allows you to remove image backgrounds using ai models.",
+  "author": "Oscar R.C.",
+  "license": "MIT",
+  "homepage": "https://image-monster.oscarrc.me",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oscarrc/image-monster.git"
+  },
+  "keywords": [
+    "image",
+    "processing",
+    "machine-learning",
+    "web-application",
+    "image-monster"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -35,6 +50,7 @@
     "globals": "^16.0.0",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.26.1",
-    "vite": "^6.3.1"
+    "vite": "^6.3.1",
+    "vite-plugin-pwa": "^1.0.0"
   }
 }
