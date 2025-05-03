@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 
 const Layout = ({ children }: { children?: ReactNode }) => {
   return (
-    <div className="grid grid-rows-3 layout-grid min-h-screen max-h-auto md:max-h-screen overflow-hidden bg-base-100">
+    <div className="grid grid-rows-3 layout-grid min-h-screen max-h-auto md:max-h-screen bg-base-100">
       <Header />
 
       <motion.main
