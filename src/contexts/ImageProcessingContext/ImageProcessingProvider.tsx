@@ -349,7 +349,7 @@ export const ImageProcessingProvider = ({
     }
   };
 
-  const updateImageOptions = (id: string, newOptions: Partial<Options>) => {
+  const updateImageOptions = (_id: string, newOptions: Partial<Options>) => {
     // Update global options for all images
     updateOptions(newOptions);
   };

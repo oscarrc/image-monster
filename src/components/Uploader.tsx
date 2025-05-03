@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, KeyboardEvent } from "react";
 
 import { FiUploadCloud } from "react-icons/fi";
 import { motion } from "framer-motion";
@@ -47,6 +47,13 @@ const Uploader = () => {
     fileInputRef.current?.click();
   };
 
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleButtonClick();
+    }
+  };
+
   return (
     <div
       className={`w-full h-full border-4 ${
@@ -58,11 +65,17 @@ const Uploader = () => {
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
+      role="region"
+      aria-label="File upload area"
     >
       <motion.div
         className="flex flex-col items-center gap-4 cursor-pointer"
         whileHover={{ scale: 1.05 }}
         onClick={handleButtonClick}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+        role="button"
+        aria-label={hasImages ? "Upload more images" : "Upload images"}
       >
         <motion.div
           animate={{
@@ -73,6 +86,7 @@ const Uploader = () => {
             repeat: Infinity,
             repeatType: "reverse",
           }}
+          aria-hidden="true"
         >
           <FiUploadCloud className={`${hasImages ? 'w-12 h-12' : 'w-16 h-16'} text-primary transition-all duration-300`} />
         </motion.div>
@@ -93,6 +107,8 @@ const Uploader = () => {
           accept="image/*"
           multiple
           onChange={handleFileChange}
+          aria-hidden="true"
+          tabIndex={-1}
         />
       </motion.div>
     </div>

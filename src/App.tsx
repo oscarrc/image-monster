@@ -33,7 +33,7 @@ const App = () => {
     if (processedImages.length === 1) {
       const image = processedImages[0];
       const filename = `${image.name.split(".")[0]}_nobg.png`;
-
+      
       fetch(image.processedUrl)
         .then((response) => response.blob())
         .then((blob) => {
@@ -73,6 +73,8 @@ const App = () => {
         className={`w-full flex flex-col transition-all duration-500 items-center py-2 gap-4 ${
           !hasImages ? "justify-center h-full" : "justify-start"
         }`}
+        role="main"
+        aria-label="Image background removal application"
       >
         <AnimatePresence>
           {!hasImages && (
@@ -117,6 +119,7 @@ const App = () => {
           }}
           transition={{ duration: 0.4 }}
           className="w-full max-w-3xl mx-auto flex-shrink-0"
+          aria-label="Image upload area"
         >
           <Uploader />
         </motion.div>
@@ -129,6 +132,7 @@ const App = () => {
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.5 }}
               className="w-full max-w-3xl flex-grow overflow-hidden bg-base-200 rounded-box my-4"
+              aria-label="Uploaded images list"
             >
               <div className="h-full max-h-[calc(100vh-15rem)] overflow-y-auto">
                 <ImageList />
@@ -137,7 +141,11 @@ const App = () => {
           )}
         </AnimatePresence>
 
-        <div className="fixed bottom-15 right-6 z-50 flex flex-col items-center gap-2">
+        <div 
+          className="fixed bottom-15 right-6 z-50 flex flex-col items-center gap-2"
+          role="group" 
+          aria-label="Image processing actions"
+        >
           {hasProcessedImages && !isProcessing && (
             <motion.button
               className="btn btn-primary btn-outline btn-md btn-circle shadow-lg"
@@ -146,8 +154,10 @@ const App = () => {
               animate={{ opacity: 1, y: 0 }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              aria-label={`Download ${images.filter(img => img.status === "completed").length === 1 ? "processed image" : "all processed images as ZIP"}`}
+              tabIndex={0}
             >
-              <BsCloudDownload className="h-5 w-5" />
+              <BsCloudDownload className="h-5 w-5" aria-hidden="true" />
             </motion.button>
           )}
 
@@ -160,11 +170,13 @@ const App = () => {
               animate={{ opacity: 1, y: 0 }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              aria-label="Process all images"
+              tabIndex={0}
             >
               {isProcessing ? (
-                <span className="loading loading-spinner"></span>
+                <span className="loading loading-spinner" aria-hidden="true"></span>
               ) : (
-                <CiPlay1 className="h-6 w-6" />
+                <CiPlay1 className="h-6 w-6" aria-hidden="true" />
               )}
             </motion.button>
           )}
