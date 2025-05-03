@@ -1,5 +1,4 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
 
 import { BsCloudDownload } from "react-icons/bs";
 import { CiPlay1 } from "react-icons/ci";
@@ -34,10 +33,10 @@ const App = () => {
     if (processedImages.length === 1) {
       const image = processedImages[0];
       const filename = `${image.name.split(".")[0]}_nobg.png`;
-      
+
       fetch(image.processedUrl)
-        .then(response => response.blob())
-        .then(blob => {
+        .then((response) => response.blob())
+        .then((blob) => {
           saveAs(blob, filename);
         });
       return;

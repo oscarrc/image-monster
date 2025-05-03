@@ -154,7 +154,7 @@ export const ImageList = () => {
         isOpen={previewImage !== null}
         onClose={closePreview}
         title={`${previewImage?.name}`}
-        size="full"
+        size="xl"
       >
         {previewImage?.processedUrl && (
           <>
