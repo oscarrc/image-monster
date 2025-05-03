@@ -1,54 +1,71 @@
-# React + TypeScript + Vite
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Y8Y43D7I3)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## ImageMonster 1.0.0
 
-Currently, two official plugins are available:
+A free online AI-powered background removal tool.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+![ImageMonster](https://github.com/oscarrc/image-monster/blob/master/public/screenshot-wide.png?raw=true "ImageMonster AI Background Remover")
 
-## Expanding the ESLint configuration
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://image-monster.oscarrc.me" target="_BLANK">
+      <img width="175" src="https://user-images.githubusercontent.com/3104648/28969264-d14f6178-791b-11e7-9399-e7820d6aaa39.png" alt="PWA"></a>
+    </td>
+  </tr>
+</table>
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+### THIS IS A WORK IN PROGRESS
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+This is still a work in progress, so expect some bugs and issues.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+#### TODOs
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+- [x] Implement basic background removal
+- [x] Client-side processing with no data uploads
+- [x] Add support for multiple file formats
+- [x] Enable batch processing
+- [ ] Add fine-tuning options for edge detection
+- [ ] Implement image enhancement tools
+
+If you miss any feature, please, request it.
+
+### How it works
+
+1. Go to the [ImageMonster page](https://image-monster.oscarrc.me)
+2. Drag and drop or select images to upload
+3. Wait for the AI to process your images
+4. Download your images with transparent backgrounds
+
+### Features
+
+- Installable, and works offline as a PWA
+- Process images locally in your browser
+  - No data is sent to any server
+  - Your privacy is completely protected
+- Support for multiple image formats
+  - JPG, PNG, and WebP supported
+  - Up to 10MB per file
+- Batch processing capability
+  - Process multiple images at once
+  - Queue system for sequential processing
+- One-click download
+  - Download individual images
+  - Option to download all as ZIP
+- No sign-up required
+  - Start using immediately
+  - No account creation needed
+
+### Found a bug?
+
+Open an [issue](https://github.com/oscarrc/image-monster/issues) and let me know.
+
+### Do you wanna help?
+
+[Buy me a coffee](https://ko-fi.com/Y8Y43D7I3), and feel free to open a PR
+
+### License
+
+This work is licensed under the [MIT License](https://github.com/oscarrc/image-monster/blob/master/LICENSE)

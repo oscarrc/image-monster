@@ -76,6 +76,20 @@ export default defineConfig({
             "purpose": "any"
           },
         ],
+        "screenshots": [
+          {
+            "src": "/screenshot-wide.png",
+            "sizes": "1919x909",
+            "type": "image/png",
+            "form_factor": "wide",
+          },
+          {
+            "src": "/screenshot.png",
+            "sizes": "375x908",
+            "type": "image/png",
+            "form_factor": "narrow",
+          }
+        ],
         "theme_color": "#001E29",
         "background_color": "#001E29",
         "display": "standalone"
