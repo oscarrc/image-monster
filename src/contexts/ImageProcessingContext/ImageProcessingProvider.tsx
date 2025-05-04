@@ -135,8 +135,6 @@ export const ImageProcessingProvider = ({
       input_image: pixel_values,
     });
 
-    console.log("Model output:", output, output_image);
-
     const outputImage = output || output_image;
 
     // Process the mask with better quality
