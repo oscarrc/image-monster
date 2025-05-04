@@ -84,7 +84,7 @@ export default defineConfig({
             "form_factor": "wide",
           },
           {
-            "src": "/screenshot.png",
+            "src": "/screenshot-portrait.png",
             "sizes": "375x908",
             "type": "image/png",
             "form_factor": "narrow",
