@@ -126,10 +126,7 @@ export const ImageProcessingProvider = ({
   }, [cleanup, progresCallback, selectedModel, addToast]);
 
   const removeBackground = async (img: RawImage, optionsToUse: Options) => {
-    const targetSize = 512;
-    const resizedImage = await img.resize(targetSize, targetSize);
-
-    const { pixel_values } = await processor.current!(resizedImage);
+    const { pixel_values } = await processor.current!(img);
     const { output, output_image } = await model.current!({
       input: pixel_values,
       input_image: pixel_values,
