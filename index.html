@@ -85,6 +85,77 @@
               </div>
             </div>
           </div>
+
+          <div class="w-full max-w-3xl mx-auto bg-base-200 rounded-box p-4">
+            <h3 class="text-lg font-medium border-b pb-2 mb-4">Available Models</h3>
+            <div class="space-y-4">
+              <div class="collapse collapse-arrow bg-base-100 rounded-lg border border-primary">
+                <input type="checkbox" defaultChecked="false" />
+                <div class="collapse-title font-medium cursor-pointer text-primary">
+                  <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                      <span>RMBG-1.4 (BRIA AI)</span>
+                      <span class="badge badge-sm badge-primary">Selected</span>
+                    </div>
+                    <div class="text-xs text-base-content/70">~175MB</div>
+                  </div>
+                </div>
+                <div class="collapse-content">
+                  <p class="text-sm text-base-content/70 mb-3">
+                    BRIA's Background Removal model is a professional-grade, state-of-the-art segmentation model
+                    trained on a diverse, high-quality dataset.
+                  </p>
+                  <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-base-content/60 mb-3">
+                    <span>✓ Higher accuracy</span>
+                    <span>✓ Larger model</span>
+                    <span>✓ Better for complex images</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <a href="https://huggingface.co/briaai/RMBG-1.4" target="_blank" rel="noopener noreferrer"
+                      class="text-xs link text-primary">
+                      View on Hugging Face
+                    </a>
+
+                    <button class="btn btn-xs btn-disabled">
+                      Selected
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="collapse collapse-arrow bg-base-100 rounded-lg border border-base-300">
+                <input type="checkbox" defaultChecked="false" />
+                <div class="collapse-title font-medium cursor-pointer">
+                  <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                      <span>MODNet (Xenova)</span>
+                    </div>
+                    <div class="text-xs text-base-content/70">~25MB</div>
+                  </div>
+                </div>
+                <div class="collapse-content">
+                  <p class="text-sm text-base-content/70 mb-3">
+                    MODNet is a fast, lightweight model for portrait matting that works in real-time.
+                    It uses a trimap-free approach for background removal.
+                  </p>
+                  <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-base-content/60 mb-3">
+                    <span>✓ Fast processing</span>
+                    <span>✓ Smaller size</span>
+                    <span>✓ Optimized for portraits</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <a href="https://huggingface.co/Xenova/modnet" target="_blank" rel="noopener noreferrer"
+                      class="text-xs link text-primary">
+                      View on Hugging Face
+                    </a>
+                    <button class="btn btn-xs btn-disabled">
+                      Select Model
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p class="text-center text-base-content/70 text-sm pt-2">Enable Javascript to enjoy AI Background removal</p>
+          </div>
         </div>
       </main>
       <footer class="footer sm:footer-horizontal footer-center bg-base-300 text-base-content p-2">
