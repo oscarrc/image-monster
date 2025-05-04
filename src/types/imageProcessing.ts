@@ -6,6 +6,7 @@ export interface Options {
   featherEnabled: boolean;
   featherRadius: number;
   preserveEdges: boolean;
+  selectedModel: string;
 }
 
 export interface ProcessedImage {
@@ -24,4 +25,11 @@ export const DEFAULT_OPTIONS: Options = {
   featherEnabled: false,
   featherRadius: 5,
   preserveEdges: false,
+  selectedModel: "RMGB-1.4",
 }; 
+
+
+export const MODELS: Record<string, string> = {
+  modnet: "Xenova/modnet",
+  "RMGB-1.4": "briaai/RMBG-1.4",
+};

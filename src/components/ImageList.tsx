@@ -1,4 +1,6 @@
 import { IoCloseOutline, IoEyeOutline } from "react-icons/io5";
+import { KeyboardEvent, useState } from "react";
+import { MODELS, ProcessedImage } from "../types/imageProcessing";
 
 import { AnimatePresence } from "framer-motion";
 import { BsCloudDownload } from "react-icons/bs";
@@ -6,10 +8,8 @@ import { CiPlay1 } from "react-icons/ci";
 import { GiSettingsKnobs } from "react-icons/gi";
 import { ImageSettings } from "./ImageSettings";
 import { Modal } from "./Modal";
-import { ProcessedImage } from "../types/imageProcessing";
 import { ResultPreview } from "./ResultPreview";
 import { useImageProcessing } from "../contexts/ImageProcessingContext/useImageProcessing";
-import { KeyboardEvent, useState } from "react";
 
 export const ImageList = () => {
   const {
@@ -41,8 +41,15 @@ export const ImageList = () => {
     setPreviewImage(null);
   };
 
-  const handleKeyPress = (e: KeyboardEvent<HTMLButtonElement | HTMLAnchorElement>, action: () => void) => {
-    if (e.key === 'Enter' || e.key === ' ') {
+  const handleModelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    updateImageOptions("global", { selectedModel: e.target.value });
+  };
+
+  const handleKeyPress = (
+    e: KeyboardEvent<HTMLButtonElement | HTMLAnchorElement>,
+    action: () => void
+  ) => {
+    if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       action();
     }
@@ -57,18 +64,32 @@ export const ImageList = () => {
 
   return (
     <>
-      <ul 
+      <ul
         className="list bg-base-200 rounded-box shadow-md w-full"
         role="list"
         aria-label="Uploaded images list"
       >
-        <li className="p-4 sticky top-0 z-50 bg-base-200 text-xs tracking-wide">
-          Uploaded Images
+        <li className="p-4 sticky top-0 z-50 bg-base-200 text-xs tracking-wide flex justify-between">
+          <span>Uploaded Images</span>
+          <div className="flex gap-2 items-center">
+            <label>Model: </label>
+            <select 
+              className="select select-xs select-primary" 
+              onChange={handleModelChange}
+              value={options.selectedModel}
+            >
+              {Object.keys(MODELS).map((model) => (
+                <option key={model} value={model}>
+                  {model}
+                </option>
+              ))}
+            </select>
+          </div>
         </li>
 
         {images.map((image: ProcessedImage) => (
-          <li 
-            key={image.id} 
+          <li
+            key={image.id}
             role="listitem"
             aria-label={`Image: ${image.name}, Status: ${image.status}`}
           >
@@ -82,7 +103,7 @@ export const ImageList = () => {
                   />
                   {image.status === "processing" && (
                     <div className="absolute inset-0 flex items-center justify-center bg-base-300 bg-opacity-70">
-                      <span 
+                      <span
                         className="loading loading-spinner loading-sm text-primary"
                         aria-label="Processing"
                         role="status"
@@ -110,7 +131,9 @@ export const ImageList = () => {
                 <button
                   className="btn btn-square btn-ghost btn-sm"
                   onClick={() => processImageById(image.id)}
-                  onKeyDown={(e) => handleKeyPress(e, () => processImageById(image.id))}
+                  onKeyDown={(e) =>
+                    handleKeyPress(e, () => processImageById(image.id))
+                  }
                   disabled={image.status === "processing"}
                   aria-label={`Process image ${image.name}`}
                   tabIndex={0}
@@ -122,8 +145,12 @@ export const ImageList = () => {
               <button
                 className="btn btn-square btn-ghost btn-sm"
                 onClick={() => toggleExpand(image.id)}
-                onKeyDown={(e) => handleKeyPress(e, () => toggleExpand(image.id))}
-                aria-label={`${expandedImageId === image.id ? 'Hide' : 'Show'} settings for ${image.name}`}
+                onKeyDown={(e) =>
+                  handleKeyPress(e, () => toggleExpand(image.id))
+                }
+                aria-label={`${
+                  expandedImageId === image.id ? "Hide" : "Show"
+                } settings for ${image.name}`}
                 aria-expanded={expandedImageId === image.id}
                 aria-controls={`settings-${image.id}`}
                 tabIndex={0}
@@ -136,7 +163,9 @@ export const ImageList = () => {
                   <button
                     className="btn btn-square btn-ghost btn-sm"
                     onClick={() => openPreview(image)}
-                    onKeyDown={(e) => handleKeyPress(e, () => openPreview(image))}
+                    onKeyDown={(e) =>
+                      handleKeyPress(e, () => openPreview(image))
+                    }
                     aria-label={`Preview result for ${image.name}`}
                     tabIndex={0}
                   >
@@ -150,9 +179,9 @@ export const ImageList = () => {
                     aria-label={`Download processed image ${image.name}`}
                     tabIndex={0}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
+                      if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault();
-                        const link = document.createElement('a');
+                        const link = document.createElement("a");
                         link.href = image.processedUrl as string;
                         link.download = `${image.name.split(".")[0]}_nobg.png`;
                         link.click();
@@ -167,7 +196,9 @@ export const ImageList = () => {
               <button
                 className="btn btn-square btn-ghost btn-sm"
                 onClick={() => removeImage(image.id)}
-                onKeyDown={(e) => handleKeyPress(e, () => removeImage(image.id))}
+                onKeyDown={(e) =>
+                  handleKeyPress(e, () => removeImage(image.id))
+                }
                 aria-label={`Remove image ${image.name}`}
                 tabIndex={0}
               >

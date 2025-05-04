@@ -9,6 +9,7 @@ import {
 } from "@huggingface/transformers";
 import {
   DEFAULT_OPTIONS,
+  MODELS,
   Options,
   ProcessedImage,
 } from "../../types/imageProcessing";
@@ -25,8 +26,6 @@ import { ImageProcessingContext } from ".";
 
 env.allowLocalModels = false;
 env.useBrowserCache = true;
-
-const MODEL = "Xenova/modnet";
 
 export const ImageProcessingProvider = ({
   children,
@@ -103,10 +102,16 @@ export const ImageProcessingProvider = ({
       // Add a small delay to ensure cleanup is complete
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      model.current = await AutoModel.from_pretrained(MODEL, {
+      const modelName = options.selectedModel;
+      const modelId = MODELS[modelName];
+      
+      model.current = await AutoModel.from_pretrained(modelId, {
         progress_callback: progresCallback,
       });
-      processor.current = await AutoProcessor.from_pretrained(MODEL, {});
+      processor.current = await AutoProcessor.from_pretrained(
+        modelId,
+        {}
+      );
     } catch (error) {
       console.error("Error loading model:", error);
       if (error instanceof Error && error.name === "AbortError") {
@@ -116,7 +121,7 @@ export const ImageProcessingProvider = ({
       }
       throw new Error("Failed to load AI model");
     }
-  }, [cleanup, progresCallback]);
+  }, [cleanup, progresCallback, options.selectedModel]);
 
   const removeBackground = async (img: RawImage, optionsToUse: Options) => {
     const targetSize = 512;

@@ -41,6 +41,7 @@ export const ImageProcessingContext = createContext<ImageProcessingContextType>(
       featherEnabled: false,
       featherRadius: 5,
       preserveEdges: false,
+      selectedModel: "modnet",
     },
     setImage: () => {},
     setProcessedImage: () => {},

@@ -33,7 +33,7 @@ const App = () => {
     if (processedImages.length === 1) {
       const image = processedImages[0];
       const filename = `${image.name.split(".")[0]}_nobg.png`;
-      
+
       fetch(image.processedUrl)
         .then((response) => response.blob())
         .then((blob) => {
@@ -141,9 +141,9 @@ const App = () => {
           )}
         </AnimatePresence>
 
-        <div 
-          className="fixed bottom-15 right-6 z-50 flex flex-col items-center gap-2"
-          role="group" 
+        <div
+          className="fixed bottom-15 right-6 z-10 flex flex-col items-center gap-2"
+          role="group"
           aria-label="Image processing actions"
         >
           {hasProcessedImages && !isProcessing && (
@@ -154,7 +154,11 @@ const App = () => {
               animate={{ opacity: 1, y: 0 }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              aria-label={`Download ${images.filter(img => img.status === "completed").length === 1 ? "processed image" : "all processed images as ZIP"}`}
+              aria-label={`Download ${
+                images.filter((img) => img.status === "completed").length === 1
+                  ? "processed image"
+                  : "all processed images as ZIP"
+              }`}
               tabIndex={0}
             >
               <BsCloudDownload className="h-5 w-5" aria-hidden="true" />
@@ -174,7 +178,10 @@ const App = () => {
               tabIndex={0}
             >
               {isProcessing ? (
-                <span className="loading loading-spinner" aria-hidden="true"></span>
+                <span
+                  className="loading loading-spinner"
+                  aria-hidden="true"
+                ></span>
               ) : (
                 <CiPlay1 className="h-6 w-6" aria-hidden="true" />
               )}
