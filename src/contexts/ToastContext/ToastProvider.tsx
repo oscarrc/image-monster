@@ -23,8 +23,8 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const toastTypes = {
-    info: "alert-info",
-    success: "alert-success",
+    info: "bg-secondary text-secondary-content",
+    success: "bg-primary text-primary-content",
     warning: "alert-warning",
     error: "alert-error",
   };

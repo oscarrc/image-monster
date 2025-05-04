@@ -13,7 +13,7 @@ export interface ImageProcessingContextType {
   selectedModel: string;
   setImage: (image: string | null) => void;
   setProcessedImage: (image: string | null) => void;
-  processImage: (image: string | URL) => Promise<string>;
+  processImage: (image: string | URL) => Promise<string | null>;
   resetImage: () => void;
   resetProcessing: () => void;
   updateOptions: (newOptions: Partial<Options>) => void;
@@ -44,7 +44,7 @@ export const ImageProcessingContext = createContext<ImageProcessingContextType>(
       featherRadius: 5,
       preserveEdges: false,
     },
-    selectedModel: "RMGB-1.4",
+    selectedModel: "briaai/RMBG-1.4",
     setImage: () => {},
     setProcessedImage: () => {},
     processImage: async () => "",

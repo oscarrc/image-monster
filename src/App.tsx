@@ -10,10 +10,12 @@ import { ProcessedImage } from "./types/imageProcessing";
 import Uploader from "./components/Uploader";
 import { saveAs } from "file-saver";
 import { useImageProcessing } from "./contexts/ImageProcessingContext/useImageProcessing";
+import { useToast } from "./contexts/ToastContext/useToast";
 
 const App = () => {
   const { images, processAllImages, isProcessing, hasProcessedImages } =
     useImageProcessing();
+  const { addToast } = useToast();
 
   const hasImages = images.length > 0;
 
@@ -25,8 +27,11 @@ const App = () => {
     );
 
     if (processedImages.length === 0) {
-      // If no processed images, show an alert
-      alert("No processed images to download. Please process images first.");
+      // Show a toast notification instead of an alert
+      addToast(
+        "No processed images to download. Please process images first.",
+        "warning"
+      );
       return;
     }
 
@@ -115,7 +120,7 @@ const App = () => {
           initial={{ opacity: 0 }}
           animate={{
             opacity: 1,
-            height: hasImages ? "9.375rem" : "16rem",
+            height: hasImages ? "10rem" : "15rem",
             marginBottom: hasImages ? "0.5rem" : "0",
           }}
           transition={{ duration: 0.4 }}
@@ -145,7 +150,7 @@ const App = () => {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.5 }}
-              className="w-full max-w-3xl flex-grow overflow-hidden bg-base-200 rounded-box my-4"
+              className="w-full max-w-3xl flex-grow overflow-hidden bg-base-200 rounded-box"
               aria-label="Uploaded images list"
             >
               <div className="h-full max-h-[calc(100vh-15rem)] overflow-y-auto">

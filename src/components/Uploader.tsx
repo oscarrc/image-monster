@@ -1,14 +1,49 @@
-import { useRef, useState, KeyboardEvent } from "react";
+import { KeyboardEvent, useRef, useState } from "react";
 
-import { FiUploadCloud } from "react-icons/fi";
+import { BsCloudUpload } from "react-icons/bs";
 import { motion } from "framer-motion";
 import { useImageProcessing } from "../contexts/ImageProcessingContext/useImageProcessing";
+import { useToast } from "../contexts/ToastContext/useToast";
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 const Uploader = () => {
   const { addImages, images } = useImageProcessing();
+  const { addToast } = useToast();
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const hasImages = images.length > 0;
+
+  const validateAndAddFiles = (files: FileList) => {
+    const validFiles = Array.from(files).filter((file) => {
+      // Check file type
+      if (!file.type.startsWith("image/")) {
+        addToast(`${file.name} is not a supported image format`, "error");
+        return false;
+      }
+
+      // Check file size
+      if (file.size > MAX_FILE_SIZE) {
+        addToast(`${file.name} exceeds the 10MB size limit`, "error");
+        return false;
+      }
+
+      return true;
+    });
+
+    if (validFiles.length > 0) {
+      // Create a new FileList-like object with only valid files
+      const dataTransfer = new DataTransfer();
+      validFiles.forEach((file) => dataTransfer.items.add(file));
+      addImages(dataTransfer.files);
+
+      if (validFiles.length === 1) {
+        addToast(`Added ${validFiles[0].name}`, "success");
+      } else {
+        addToast(`Added ${validFiles.length} images`, "success");
+      }
+    }
+  };
 
   const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -33,13 +68,13 @@ const Uploader = () => {
     setIsDragging(false);
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      addImages(e.dataTransfer.files);
+      validateAndAddFiles(e.dataTransfer.files);
     }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      addImages(e.target.files);
+      validateAndAddFiles(e.target.files);
     }
   };
 
@@ -48,7 +83,7 @@ const Uploader = () => {
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Enter' || e.key === ' ') {
+    if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       handleButtonClick();
     }
@@ -88,11 +123,21 @@ const Uploader = () => {
           }}
           aria-hidden="true"
         >
-          <FiUploadCloud className={`${hasImages ? 'w-12 h-12' : 'w-16 h-16'} text-primary transition-all duration-300`} />
+          <BsCloudUpload
+            className={`${
+              hasImages ? "w-12 h-12" : "w-16 h-16"
+            } text-primary transition-all duration-300`}
+          />
         </motion.div>
         <div className="text-center">
-          <h3 className={`${hasImages ? 'text-lg' : 'text-xl'} mb-2 transition-all duration-300`}>
-            {hasImages ? 'Upload More Images' : 'Drag & Drop or Click to Upload'}
+          <h3
+            className={`${
+              hasImages ? "text-lg" : "text-xl"
+            } mb-2 transition-all duration-300`}
+          >
+            {hasImages
+              ? "Upload More Images"
+              : "Drag & Drop or Click to Upload"}
           </h3>
           {!hasImages && (
             <p className="text-base-content/60">

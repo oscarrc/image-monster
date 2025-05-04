@@ -22,6 +22,7 @@ import {
 } from "react";
 
 import { ImageProcessingContext } from ".";
+import { useToast } from "../ToastContext/useToast";
 
 env.allowLocalModels = false;
 env.useBrowserCache = true;
@@ -38,6 +39,7 @@ export const ImageProcessingProvider = ({
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [options, setOptions] = useState<Options>(DEFAULT_OPTIONS);
   const [selectedModel, setSelectedModel] = useState<string>("briaai/RMBG-1.4");
+  const { addToast } = useToast();
 
   const [images, setImages] = useState<ProcessedImage[]>([]);
 
@@ -114,13 +116,13 @@ export const ImageProcessingProvider = ({
     } catch (error) {
       console.error("Error loading model:", error);
       if (error instanceof Error && error.name === "AbortError") {
-        throw new Error(
-          "GPU resources are no longer available. Please refresh the page and try again."
-        );
+        addToast("GPU resources are no longer available. Please refresh the page and try again.", "error");
+        return null;
       }
-      throw new Error("Failed to load AI model");
+      addToast("Failed to load AI model", "error");
+      return null;
     }
-  }, [cleanup, progresCallback, selectedModel]);
+  }, [cleanup, progresCallback, selectedModel, addToast]);
 
   const removeBackground = async (img: RawImage, optionsToUse: Options) => {
     const targetSize = 512;
@@ -267,7 +269,8 @@ export const ImageProcessingProvider = ({
 
   const processImage = async (imageUrl: string | URL) => {
     if (!imageUrl) {
-      throw new Error("No image provided");
+      addToast("No image provided", "error");
+      return null;
     }
 
     setIsProcessing(true);
@@ -279,7 +282,8 @@ export const ImageProcessingProvider = ({
         img = await RawImage.fromURL(imageUrl);
       } catch (error) {
         console.error("Error loading image:", error);
-        throw new Error("Failed to load image");
+        addToast("Failed to load image", "error");
+        throw error;
       }
 
       const processedImage = await removeBackground(img, options);
@@ -323,7 +327,8 @@ export const ImageProcessingProvider = ({
         img = await RawImage.fromURL(image.originalUrl);
       } catch (error) {
         console.error("Error loading image:", error);
-        throw new Error("Failed to load image");
+        addToast(`Failed to load image: ${image.name}`, "error");
+        throw error;
       }
 
       const processedUrl = await removeBackground(img, image.options);
@@ -333,11 +338,14 @@ export const ImageProcessingProvider = ({
           img.id === id ? { ...img, processedUrl, status: "completed" } : img
         )
       );
+      
+      addToast(`Background removed from ${image.name}`, "success");
     } catch (error) {
       console.error("Error processing image:", error);
       setImages((prev) =>
         prev.map((img) => (img.id === id ? { ...img, status: "error" } : img))
       );
+      addToast(`Error processing ${image.name}`, "error");
     }
   };
 
