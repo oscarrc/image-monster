@@ -37,14 +37,14 @@ export interface Model {
 }
 
 export const MODELS: Model[] = [
-  {
-    id: "briaai/RMBG-2.0",
-    name: "RMBG-2.0",
-    creator: "BRIA AI",
-    size: "~1GB",
-    description: "BRIA's RMBG-2.0 is a state-of-the-art background removal model that significantly improves upon RMBG-1.4. Trained on carefully selected diverse datasets including general stock images, e-commerce, gaming, and advertising content.",
-    features: ["Highest accuracy", "Advanced architecture", "Excellent for professional use"]
-  },
+  // {
+  //   id: "briaai/RMBG-2.0",
+  //   name: "RMBG-2.0",
+  //   creator: "BRIA AI",
+  //   size: "~1GB",
+  //   description: "BRIA's RMBG-2.0 is a state-of-the-art background removal model that significantly improves upon RMBG-1.4. Trained on carefully selected diverse datasets including general stock images, e-commerce, gaming, and advertising content.",
+  //   features: ["Highest accuracy", "Advanced architecture", "Excellent for professional use"]
+  // },
   {
     id: "onnx-community/BiRefNet-ONNX",
     name: "BiRefNet",

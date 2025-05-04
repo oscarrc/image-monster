@@ -105,18 +105,19 @@ export const ImageProcessingProvider = ({
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       const modelId = selectedModel;
-      
+
       model.current = await AutoModel.from_pretrained(modelId, {
+        dtype: "fp32",
         progress_callback: progresCallback,
       });
-      processor.current = await AutoProcessor.from_pretrained(
-        modelId,
-        {}
-      );
+      processor.current = await AutoProcessor.from_pretrained(modelId, {});
     } catch (error) {
       console.error("Error loading model:", error);
       if (error instanceof Error && error.name === "AbortError") {
-        addToast("GPU resources are no longer available. Please refresh the page and try again.", "error");
+        addToast(
+          "GPU resources are no longer available. Please refresh the page and try again.",
+          "error"
+        );
         return null;
       }
       addToast("Failed to load AI model", "error");
@@ -129,13 +130,18 @@ export const ImageProcessingProvider = ({
     const resizedImage = await img.resize(targetSize, targetSize);
 
     const { pixel_values } = await processor.current!(resizedImage);
-    const { output } = await model.current!({
+    const { output, output_image } = await model.current!({
       input: pixel_values,
+      input_image: pixel_values,
     });
+
+    console.log("Model output:", output, output_image);
+
+    const outputImage = output || output_image;
 
     // Process the mask with better quality
     const maskData = (
-      await RawImage.fromTensor(output[0].mul(255).to("uint8")).resize(
+      await RawImage.fromTensor(outputImage[0].mul(255).to("uint8")).resize(
         img.width,
         img.height
       )
@@ -303,7 +309,7 @@ export const ImageProcessingProvider = ({
       processedUrl: null,
       status: "pending",
       name: file.name,
-      options: { ...DEFAULT_OPTIONS }
+      options: { ...DEFAULT_OPTIONS },
     }));
 
     setImages((prev) => [...prev, ...newImages]);
@@ -338,7 +344,7 @@ export const ImageProcessingProvider = ({
           img.id === id ? { ...img, processedUrl, status: "completed" } : img
         )
       );
-      
+
       addToast(`Background removed from ${image.name}`, "success");
     } catch (error) {
       console.error("Error processing image:", error);
@@ -365,13 +371,13 @@ export const ImageProcessingProvider = ({
   const updateImageOptions = (id: string, newOptions: Partial<Options>) => {
     if (id === "global") {
       // Update global options for new images
-      setOptions(prev => ({
+      setOptions((prev) => ({
         ...prev,
-        ...newOptions
+        ...newOptions,
       }));
       return;
     }
-    
+
     // Update options for a specific image
     setImages((prev) =>
       prev.map((img) =>
