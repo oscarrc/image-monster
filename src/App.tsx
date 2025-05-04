@@ -5,6 +5,7 @@ import { CiPlay1 } from "react-icons/ci";
 import { ImageList } from "./components/ImageList";
 import JSZip from "jszip";
 import Layout from "./components/layout";
+import { ModelInfo } from "./components/ModelInfo";
 import { ProcessedImage } from "./types/imageProcessing";
 import Uploader from "./components/Uploader";
 import { saveAs } from "file-saver";
@@ -123,6 +124,19 @@ const App = () => {
         >
           <Uploader />
         </motion.div>
+
+        <AnimatePresence>
+          {!hasImages && (
+            <motion.div
+              initial={{ opacity: 0, y: "1.25rem" }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <ModelInfo />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <AnimatePresence>
           {hasImages && (
