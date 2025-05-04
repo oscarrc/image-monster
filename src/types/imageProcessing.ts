@@ -50,7 +50,7 @@ export const MODELS: Model[] = [
     name: "BiRefNet",
     creator: "ONNX Community",
     size: "~900MB",
-    description: "BiRefNet is a high-resolution dichotomous image segmentation model that uses bilateral reference for advanced background removal. Optimized for web use via ONNX format.",
+    description: "BiRefNet is a high-resolution dichotomous image segmentation model that uses bilateral reference for advanced background removal.",
     features: ["Web-optimized", "High-resolution output", "Advanced segmentation"]
   },
   {
