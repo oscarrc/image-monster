@@ -17,7 +17,8 @@ export const ImageList = () => {
     processImageById,
     updateImageOptions,
     removeImage,
-    options,
+    selectedModel,
+    updateSelectedModel,
     isProcessing,
   } = useImageProcessing();
   const [expandedImageId, setExpandedImageId] = useState<string | null>(null);
@@ -42,7 +43,7 @@ export const ImageList = () => {
   };
 
   const handleModelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    updateImageOptions("global", { selectedModel: e.target.value });
+    updateSelectedModel(e.target.value);
   };
 
   const handleKeyPress = (
@@ -73,10 +74,10 @@ export const ImageList = () => {
           <span>Uploaded Images</span>
           <div className="flex gap-2 items-center">
             <label>Model: </label>
-            <select 
-              className="select select-xs select-primary" 
+            <select
+              className="select select-xs select-primary text-base-content/70"
               onChange={handleModelChange}
-              value={options.selectedModel}
+              value={selectedModel}
             >
               {Object.keys(MODELS).map((model) => (
                 <option key={model} value={model}>
@@ -210,7 +211,7 @@ export const ImageList = () => {
               {expandedImageId === image.id && (
                 <ImageSettings
                   imageId={image.id}
-                  options={options}
+                  options={image.options}
                   isProcessing={isProcessing}
                   updateImageOptions={updateImageOptions}
                   processImage={processImageById}

@@ -6,7 +6,6 @@ export interface Options {
   featherEnabled: boolean;
   featherRadius: number;
   preserveEdges: boolean;
-  selectedModel: string;
 }
 
 export interface ProcessedImage {
@@ -15,6 +14,7 @@ export interface ProcessedImage {
   processedUrl: string | null;
   status: "pending" | "processing" | "completed" | "error";
   name: string;
+  options: Options;
 }
 
 export const DEFAULT_OPTIONS: Options = {
@@ -25,7 +25,6 @@ export const DEFAULT_OPTIONS: Options = {
   featherEnabled: false,
   featherRadius: 5,
   preserveEdges: false,
-  selectedModel: "RMGB-1.4",
 }; 
 
 

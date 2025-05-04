@@ -10,12 +10,14 @@ export interface ImageProcessingContextType {
   loadingProgress: number;
   hasProcessedImages: boolean;
   options: Options;
+  selectedModel: string;
   setImage: (image: string | null) => void;
   setProcessedImage: (image: string | null) => void;
   processImage: (image: string | URL) => Promise<string>;
   resetImage: () => void;
   resetProcessing: () => void;
   updateOptions: (newOptions: Partial<Options>) => void;
+  updateSelectedModel: (modelName: string) => void;
 
   images: ProcessedImage[];
   addImages: (files: FileList) => void;
@@ -41,14 +43,15 @@ export const ImageProcessingContext = createContext<ImageProcessingContextType>(
       featherEnabled: false,
       featherRadius: 5,
       preserveEdges: false,
-      selectedModel: "modnet",
     },
+    selectedModel: "RMGB-1.4",
     setImage: () => {},
     setProcessedImage: () => {},
     processImage: async () => "",
     resetImage: () => {},
     resetProcessing: () => {},
     updateOptions: () => {},
+    updateSelectedModel: () => {},
 
     images: [],
     addImages: () => {},

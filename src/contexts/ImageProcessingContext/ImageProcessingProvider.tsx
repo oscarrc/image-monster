@@ -38,6 +38,7 @@ export const ImageProcessingProvider = ({
   const [modelLoading, setModelLoading] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [options, setOptions] = useState<Options>(DEFAULT_OPTIONS);
+  const [selectedModel, setSelectedModel] = useState<string>("RMGB-1.4");
 
   const [images, setImages] = useState<ProcessedImage[]>([]);
 
@@ -102,8 +103,7 @@ export const ImageProcessingProvider = ({
       // Add a small delay to ensure cleanup is complete
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      const modelName = options.selectedModel;
-      const modelId = MODELS[modelName];
+      const modelId = MODELS[selectedModel];
       
       model.current = await AutoModel.from_pretrained(modelId, {
         progress_callback: progresCallback,
@@ -121,7 +121,7 @@ export const ImageProcessingProvider = ({
       }
       throw new Error("Failed to load AI model");
     }
-  }, [cleanup, progresCallback, options.selectedModel]);
+  }, [cleanup, progresCallback, selectedModel]);
 
   const removeBackground = async (img: RawImage, optionsToUse: Options) => {
     const targetSize = 512;
@@ -300,6 +300,7 @@ export const ImageProcessingProvider = ({
       processedUrl: null,
       status: "pending",
       name: file.name,
+      options: { ...DEFAULT_OPTIONS }
     }));
 
     setImages((prev) => [...prev, ...newImages]);
@@ -326,7 +327,7 @@ export const ImageProcessingProvider = ({
         throw new Error("Failed to load image");
       }
 
-      const processedUrl = await removeBackground(img, options);
+      const processedUrl = await removeBackground(img, image.options);
 
       setImages((prev) =>
         prev.map((img) =>
@@ -354,9 +355,24 @@ export const ImageProcessingProvider = ({
     }
   };
 
-  const updateImageOptions = (_id: string, newOptions: Partial<Options>) => {
-    // Update global options for all images
-    updateOptions(newOptions);
+  const updateImageOptions = (id: string, newOptions: Partial<Options>) => {
+    if (id === "global") {
+      // Update global options for new images
+      setOptions(prev => ({
+        ...prev,
+        ...newOptions
+      }));
+      return;
+    }
+    
+    // Update options for a specific image
+    setImages((prev) =>
+      prev.map((img) =>
+        img.id === id
+          ? { ...img, options: { ...img.options, ...newOptions } }
+          : img
+      )
+    );
   };
 
   const removeImage = (id: string) => {
@@ -382,6 +398,10 @@ export const ImageProcessingProvider = ({
     }));
   };
 
+  const updateSelectedModel = (modelName: string) => {
+    setSelectedModel(modelName);
+  };
+
   const value = {
     image,
     processedImage,
@@ -389,6 +409,7 @@ export const ImageProcessingProvider = ({
     modelLoading,
     loadingProgress,
     options,
+    selectedModel,
     hasProcessedImages,
     setImage,
     setProcessedImage,
@@ -396,6 +417,7 @@ export const ImageProcessingProvider = ({
     resetImage,
     resetProcessing,
     updateOptions,
+    updateSelectedModel,
 
     images,
     addImages,
