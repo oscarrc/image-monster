@@ -12,7 +12,7 @@ const Layout = ({ children }: { children?: ReactNode }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4 }}
-        className="flex-1 container mx-auto px-4 flex pt-4"
+        className="flex-1 container mx-auto p-4 flex"
       >
         {children}
       </motion.main>
