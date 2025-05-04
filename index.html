@@ -89,6 +89,73 @@
           <div class="w-full max-w-3xl mx-auto bg-base-200 rounded-box p-4">
             <h3 class="text-lg font-medium border-b pb-2 mb-4">Available Models</h3>
             <div class="space-y-4">
+              <div class="collapse collapse-arrow bg-base-100 rounded-lg border border-base-300">
+                <input type="checkbox" defaultChecked="false" />
+                <div class="collapse-title font-medium cursor-pointer">
+                  <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                      <span>RMBG-2.0 (BRIA AI)</span>
+                    </div>
+                    <div class="text-xs text-base-content/70">~1GB</div>
+                  </div>
+                </div>
+                <div class="collapse-content">
+                  <p class="text-sm text-base-content/70 mb-3">
+                    BRIA's RMBG-2.0 is a state-of-the-art background removal model that significantly improves upon
+                    RMBG-1.4.
+                    Trained on carefully selected diverse datasets including general stock images, e-commerce, gaming,
+                    and advertising content.
+                  </p>
+                  <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-base-content/60 mb-3">
+                    <span>✓ Highest accuracy</span>
+                    <span>✓ Advanced architecture</span>
+                    <span>✓ Excellent for professional use</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <a href="https://huggingface.co/briaai/RMBG-2.0" target="_blank" rel="noopener noreferrer"
+                      class="text-xs link text-primary">
+                      View on Hugging Face
+                    </a>
+                    <button class="btn btn-xs btn-disabled">
+                      Select Model
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="collapse collapse-arrow bg-base-100 rounded-lg border border-base-300">
+                <input type="checkbox" defaultChecked="false" />
+                <div class="collapse-title font-medium cursor-pointer">
+                  <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                      <span>BiRefNet (ONNX Community)</span>
+                    </div>
+                    <div class="text-xs text-base-content/70">~900MB</div>
+                  </div>
+                </div>
+                <div class="collapse-content">
+                  <p class="text-sm text-base-content/70 mb-3">
+                    BiRefNet is a high-resolution dichotomous image segmentation model that uses bilateral reference for
+                    advanced background removal.
+                    Optimized for web use via ONNX format.
+                  </p>
+                  <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-base-content/60 mb-3">
+                    <span>✓ Web-optimized</span>
+                    <span>✓ High-resolution output</span>
+                    <span>✓ Advanced segmentation</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <a href="https://huggingface.co/onnx-community/BiRefNet-ONNX" target="_blank"
+                      rel="noopener noreferrer" class="text-xs link text-primary">
+                      View on Hugging Face
+                    </a>
+                    <button class="btn btn-xs btn-disabled">
+                      Select Model
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <div class="collapse collapse-arrow bg-base-100 rounded-lg border border-primary">
                 <input type="checkbox" defaultChecked="false" />
                 <div class="collapse-title font-medium cursor-pointer text-primary">
@@ -154,7 +221,8 @@
                 </div>
               </div>
             </div>
-            <p class="text-center text-base-content/70 text-sm pt-2">Enable Javascript to enjoy AI Background removal</p>
+            <p class="text-center text-base-content/70 text-sm pt-2">Enable Javascript to enjoy AI Background removal
+            </p>
           </div>
         </div>
       </main>

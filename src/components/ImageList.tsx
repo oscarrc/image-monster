@@ -79,9 +79,9 @@ export const ImageList = () => {
               onChange={handleModelChange}
               value={selectedModel}
             >
-              {Object.keys(MODELS).map((model) => (
-                <option key={model} value={model}>
-                  {model}
+              {MODELS.map((model) => (
+                <option key={model.id} value={model.id}>
+                  {model.name}
                 </option>
               ))}
             </select>

@@ -9,7 +9,6 @@ import {
 } from "@huggingface/transformers";
 import {
   DEFAULT_OPTIONS,
-  MODELS,
   Options,
   ProcessedImage,
 } from "../../types/imageProcessing";
@@ -38,7 +37,7 @@ export const ImageProcessingProvider = ({
   const [modelLoading, setModelLoading] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [options, setOptions] = useState<Options>(DEFAULT_OPTIONS);
-  const [selectedModel, setSelectedModel] = useState<string>("RMGB-1.4");
+  const [selectedModel, setSelectedModel] = useState<string>("briaai/RMBG-1.4");
 
   const [images, setImages] = useState<ProcessedImage[]>([]);
 
@@ -103,7 +102,7 @@ export const ImageProcessingProvider = ({
       // Add a small delay to ensure cleanup is complete
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      const modelId = MODELS[selectedModel];
+      const modelId = selectedModel;
       
       model.current = await AutoModel.from_pretrained(modelId, {
         progress_callback: progresCallback,
