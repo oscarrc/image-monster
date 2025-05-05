@@ -41,6 +41,11 @@ export const ModelInfo = () => {
                         Selected
                       </span>
                     )}
+                    {!isSelected && model.recommended && (
+                      <span className="badge badge-sm badge-primary badge-outline">
+                        Recommended
+                      </span>
+                    )}
                   </div>
                   <div className="text-xs text-base-content/70">
                     {model.size}
