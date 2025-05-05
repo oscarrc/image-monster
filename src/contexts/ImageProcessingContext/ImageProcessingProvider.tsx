@@ -108,6 +108,8 @@ export const ImageProcessingProvider = ({
 
       model.current = await AutoModel.from_pretrained(modelId, {
         dtype: "fp32",
+        //@ts-expect-error navigator gpu
+        device: navigator?.gpu ? "webgpu" : "wasm",
         progress_callback: progresCallback,
       });
       processor.current = await AutoProcessor.from_pretrained(modelId, {});
