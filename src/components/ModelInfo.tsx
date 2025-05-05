@@ -1,5 +1,5 @@
-import { useImageProcessing } from "../contexts/ImageProcessingContext/useImageProcessing";
 import { MODELS } from "../types/imageProcessing";
+import { useImageProcessing } from "../contexts/ImageProcessingContext/useImageProcessing";
 
 export const ModelInfo = () => {
   const { selectedModel, updateSelectedModel } = useImageProcessing();
@@ -24,7 +24,7 @@ export const ModelInfo = () => {
                 isSelected ? "border-primary" : "border-base-300"
               }`}
             >
-              <input type="checkbox" defaultChecked={false} />
+              <input type="radio" defaultChecked={false} name="models" />
               <div
                 className={`collapse-title font-medium cursor-pointer ${
                   isSelected ? "text-primary" : ""
@@ -33,12 +33,18 @@ export const ModelInfo = () => {
               >
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
-                    <span>{model.name} ({model.creator})</span>
+                    <span>
+                      {model.name} ({model.creator})
+                    </span>
                     {isSelected && (
-                      <span className="badge badge-sm badge-primary">Selected</span>
+                      <span className="badge badge-sm badge-primary">
+                        Selected
+                      </span>
                     )}
                   </div>
-                  <div className="text-xs text-base-content/70">{model.size}</div>
+                  <div className="text-xs text-base-content/70">
+                    {model.size}
+                  </div>
                 </div>
               </div>
               <div className="collapse-content">
