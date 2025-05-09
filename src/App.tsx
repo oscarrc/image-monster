@@ -166,13 +166,9 @@ const App = () => {
           aria-label="Image processing actions"
         >
           {hasProcessedImages && !isProcessing && (
-            <motion.button
+            <button
               className="btn btn-primary btn-outline btn-md btn-circle shadow-lg"
               onClick={downloadImages}
-              initial={{ opacity: 0, y: "1.25rem" }}
-              animate={{ opacity: 1, y: 0 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
               aria-label={`Download ${
                 images.filter((img) => img.status === "completed").length === 1
                   ? "processed image"
@@ -181,18 +177,13 @@ const App = () => {
               tabIndex={0}
             >
               <BsCloudDownload className="h-5 w-5" aria-hidden="true" />
-            </motion.button>
+            </button>
           )}
 
           {hasImages && (
-            <motion.button
+            <button
               className="btn btn-primary btn-circle btn-lg shadow-lg"
               onClick={processAllImages}
-              disabled={isProcessing}
-              initial={{ opacity: 0, y: "1.25rem" }}
-              animate={{ opacity: 1, y: 0 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
               aria-label="Process all images"
               tabIndex={0}
             >
@@ -204,7 +195,7 @@ const App = () => {
               ) : (
                 <CiPlay1 className="h-6 w-6" aria-hidden="true" />
               )}
-            </motion.button>
+            </button>
           )}
         </div>
       </div>
