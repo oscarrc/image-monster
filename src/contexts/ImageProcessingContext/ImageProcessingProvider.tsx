@@ -341,8 +341,6 @@ export const ImageProcessingProvider = ({
           img.id === id ? { ...img, processedUrl, status: "completed" } : img
         )
       );
-
-      addToast(`Background removed from ${image.name}`, "success");
     } catch (error) {
       console.error("Error processing image:", error);
       setImages((prev) =>
