@@ -1,4 +1,4 @@
-import { Options } from "../types/imageProcessing";
+import { Options } from "../../../types/imageProcessing";
 import { motion } from "framer-motion";
 
 interface ImageSettingsProps {

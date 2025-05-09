@@ -2,8 +2,8 @@ import { KeyboardEvent, useRef, useState } from "react";
 
 import { BsCloudUpload } from "react-icons/bs";
 import { motion } from "framer-motion";
-import { useImageProcessing } from "../contexts/ImageProcessingContext/useImageProcessing";
-import { useToast } from "../contexts/ToastContext/useToast";
+import { useImageProcessing } from "../../../contexts/ImageProcessingContext/useImageProcessing";
+import { useToast } from "../../../contexts/ToastContext/useToast";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
@@ -36,12 +36,6 @@ const Uploader = () => {
       const dataTransfer = new DataTransfer();
       validFiles.forEach((file) => dataTransfer.items.add(file));
       addImages(dataTransfer.files);
-
-      if (validFiles.length === 1) {
-        addToast(`Added ${validFiles[0].name}`, "success");
-      } else {
-        addToast(`Added ${validFiles.length} images`, "success");
-      }
     }
   };
 

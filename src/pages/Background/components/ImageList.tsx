@@ -1,15 +1,15 @@
 import { IoCloseOutline, IoEyeOutline } from "react-icons/io5";
 import { KeyboardEvent, useState } from "react";
-import { MODELS, ProcessedImage } from "../types/imageProcessing";
+import { MODELS, ProcessedImage } from "../../../types/imageProcessing";
 
 import { AnimatePresence } from "framer-motion";
 import { BsCloudDownload } from "react-icons/bs";
 import { CiPlay1 } from "react-icons/ci";
 import { GiSettingsKnobs } from "react-icons/gi";
 import { ImageSettings } from "./ImageSettings";
-import { Modal } from "./Modal";
+import { Modal } from "../../../components/Modal";
 import { ResultPreview } from "./ResultPreview";
-import { useImageProcessing } from "../contexts/ImageProcessingContext/useImageProcessing";
+import { useImageProcessing } from "../../../contexts/ImageProcessingContext/useImageProcessing";
 
 export const ImageList = () => {
   const {
@@ -103,7 +103,7 @@ export const ImageList = () => {
                     alt={image.name}
                   />
                   {image.status === "processing" && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-base-300 bg-opacity-70">
+                    <div className="absolute inset-0 flex items-center justify-center bg-base-300/75">
                       <span
                         className="loading loading-spinner loading-sm text-primary"
                         aria-label="Processing"

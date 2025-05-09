@@ -1,3 +1,5 @@
+import { Model } from "./model";
+
 export interface Options {
   threshold: number;
   thresholdEnabled: boolean;
@@ -27,16 +29,6 @@ export const DEFAULT_OPTIONS: Options = {
   preserveEdges: false,
 }; 
 
-export interface Model {
-  id: string;
-  name: string;
-  creator: string;
-  size: string;
-  recommended: boolean;
-  description: string;
-  features: string[];
-}
-
 export const MODELS: Model[] = [
   // {
   //   id: "briaai/RMBG-2.0",
@@ -50,7 +42,7 @@ export const MODELS: Model[] = [
   {
     id: "onnx-community/BiRefNet-ONNX",
     name: "BiRefNet",
-    creator: "ONNX Community",
+    creator: "ZhengPeng7",
     size: "~900MB",
     recommended: false,
     description: "BiRefNet is a high-resolution dichotomous image segmentation model that uses bilateral reference for advanced background removal.",
