@@ -80,7 +80,7 @@ const LandingPage = () => {
           <a href="/background" className="btn btn-primary btn-lg">
             Remove Backgrounds
           </a>
-          <a href="/generation" className="btn btn-secondary btn-lg">
+          <a href="/generation" className="btn btn-primary btn-outline btn-lg">
             Generate Images
           </a>
         </div>
@@ -101,15 +101,19 @@ const LandingPage = () => {
       </div>
 
       {/* How it Works */}
-      <section className="container flex flex-col items-center mx-auto py-16 gap-8">
-        <h2 className="text-3xl font-bold text-center">How It Works</h2>
-        <p className="text-base-content/70">
-          All processing happens directly in your browser using WebGPU hardware
-          acceleration. Your images never leave your device, ensuring 100%
-          privacy.
-        </p>
+      <section className="container flex flex-col items-center mx-auto py-16 gap-16">
+        <div className="flex flex-col items-center gap-8">
+          <h2 className="text-3xl font-bold text-center">
+            How The <span className="text-primary">Monster</span> Works
+          </h2>
+          <p className="text-base-content/70 max-w-2xl text-center">
+            All processing happens directly in your browser using WebGPU
+            hardware acceleration. Your images never leave your device, ensuring
+            100% privacy.
+          </p>
+        </div>
 
-        <div className="flex flex-col lg:flex-row gap-8 max-w-5xl mx-auto">
+        <div className="flex flex-col lg:flex-row gap-8 mx-auto">
           <div className="lg:w-1/3 card bg-base-200 shadow-xl">
             <div className="card-body p-0">
               <ul className="menu bg-base-200 w-full rounded-box">
@@ -212,19 +216,26 @@ const LandingPage = () => {
       </div>
 
       {/* FAQ Section */}
-      <section className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-center mb-8">
-          Frequently Asked Questions
-        </h2>
+      <section className="container mx-auto py-16 flex flex-col items-center gap-16">
+        <div className="flex flex-col items-center gap-8">
+          <h2 className="text-3xl font-bold text-center">
+            Questions Our <span className="text-primary">Monster</span> Gets
+            Asked
+          </h2>
+          <p className="text-base-content/70 text-center max-w-2xl">
+            Here are some common questions about Image Monster. If you have
+            additional questions, feel free to reach out!
+          </p>
+        </div>
 
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-3xl mx-auto bg-base-200 rounded-box p-4">
           {faqConfig.map((faq, index) => (
             <div
               key={index}
-              className="collapse collapse-arrow bg-base-200 mb-2"
+              className="collapse collapse-arrow bg-neutral mb-2 faq"
             >
               <input type="radio" name="faq-accordion" />
-              <div className="collapse-title text-xl font-medium">
+              <div className="collapse-title text-lg font-medium">
                 {faq.question}
               </div>
               <div className="collapse-content">
@@ -236,17 +247,21 @@ const LandingPage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="container mx-auto px-4 py-12 text-center">
-        <h2 className="text-3xl font-bold mb-4">Ready to Try It?</h2>
-        <p className="text-xl mb-8">
-          Start using Image Monster today - it's free and private!
-        </p>
+      <section className="container mx-auto flex flex-col gap-16 items-center mb-16">
+        <div className="flex flex-col items-center gap-8">
+          <h2 className="text-3xl font-bold">
+            <span className="text-primary">Scared</span> to Try It?
+          </h2>
+          <p className="text-xl">
+            Start using Image Monster today - it's free and private!
+          </p>
+        </div>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <a href="/background" className="btn btn-primary btn-lg">
             Remove Backgrounds
           </a>
-          <a href="/generation" className="btn btn-secondary btn-lg">
+          <a href="/generation" className="btn btn-primary btn-outline btn-lg">
             Generate Images
           </a>
         </div>
