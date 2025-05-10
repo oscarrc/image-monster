@@ -16,6 +16,8 @@ const Generation = () => {
     isGenerating,
     modelLoading,
     loadingProgress,
+    selectedModel,
+    updateSelectedModel,
     generateImage,
   } = useImageGeneration();
 
@@ -79,7 +81,13 @@ const Generation = () => {
         {/* Options section - always visible */}
         <div className="flex flex-col gap-4 w-full max-w-3xl mx-auto">
           <GenerationSettings />
-          {!shouldCollapse && <ModelInfo models={MODELS} />}
+          {!shouldCollapse && (
+            <ModelInfo
+              models={MODELS}
+              selectedModel={selectedModel}
+              updateSelectedModel={updateSelectedModel}
+            />
+          )}
         </div>
 
         {/* Gallery section - shows when there are images */}

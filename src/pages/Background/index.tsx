@@ -12,8 +12,14 @@ import { useImageProcessing } from "@/contexts/ImageProcessingContext/useImagePr
 import { useToast } from "@/contexts/ToastContext/useToast";
 
 const Background = () => {
-  const { images, processAllImages, isProcessing, hasProcessedImages } =
-    useImageProcessing();
+  const {
+    images,
+    processAllImages,
+    isProcessing,
+    hasProcessedImages,
+    selectedModel,
+    updateSelectedModel,
+  } = useImageProcessing();
   const { addToast } = useToast();
 
   const hasImages = images.length > 0;
@@ -106,7 +112,11 @@ const Background = () => {
 
         {!hasImages && (
           <div>
-            <ModelInfo models={MODELS} />
+            <ModelInfo
+              models={MODELS}
+              selectedModel={selectedModel}
+              updateSelectedModel={updateSelectedModel}
+            />
           </div>
         )}
 

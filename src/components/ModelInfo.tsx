@@ -1,9 +1,14 @@
 import { Model } from "@/types/model";
-import { useImageProcessing } from "../contexts/ImageProcessingContext/useImageProcessing";
 
-export const ModelInfo = ({ models }: { models: Model[] }) => {
-  const { selectedModel, updateSelectedModel } = useImageProcessing();
-
+export const ModelInfo = ({
+  models,
+  selectedModel,
+  updateSelectedModel,
+}: {
+  models: Model[];
+  selectedModel: string;
+  updateSelectedModel: (modelId: string) => void;
+}) => {
   const handleModelSelect = (modelId: string) => {
     updateSelectedModel(modelId);
   };
