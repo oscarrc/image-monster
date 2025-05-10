@@ -55,62 +55,57 @@ const ImageGrid = () => {
         {generatedImages.map((image) => (
           <div
             key={image.id}
-            className="relative bg-base-200 shadow-md rounded-box overflow-hidden group hover:shadow-lg transition-all duration-300"
+            className="aspect-square relative bg-base-200 shadow-md rounded-box overflow-hidden group hover:shadow-lg transition-all duration-30"
           >
-            {/* Square aspect ratio container */}
-            <div className="aspect-square group">
-              <img
-                src={image.imageUrl}
-                alt={`Generated from prompt: ${image.prompt}`}
-                className="w-full h-full object-cover cursor-pointer"
-                onClick={() => openImageModal(image)}
-                onKeyDown={(e) =>
-                  handleKeyPress(e, () => openImageModal(image))
-                }
-                tabIndex={0}
-                role="button"
-                aria-label="View image"
-              />
+            <img
+              src={image.imageUrl}
+              alt={`Generated from prompt: ${image.prompt}`}
+              className="w-full h-full object-cover cursor-pointer"
+              onClick={() => openImageModal(image)}
+              onKeyDown={(e) => handleKeyPress(e, () => openImageModal(image))}
+              tabIndex={0}
+              role="button"
+              aria-label="View image"
+            />
 
-              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-2 pointer-events-none">
-                <div className="text-white text-xs line-clamp-3 overflow-hidden">
-                  {image.prompt}
-                </div>
+            <div className="absolute inset-0 bg-base-300/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-2 pointer-events-none">
+              <div className="text-base-content text-xs line-clamp-3 overflow-hidden">
+                {image.prompt}
+              </div>
 
-                <div className="flex justify-end gap-2 mt-auto pointer-events-auto">
-                  <button
-                    className="btn btn-circle btn-ghost btn-xs text-white hover:bg-white/20"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeGeneratedImage(image.id);
-                    }}
-                    aria-label="Delete image"
-                  >
-                    <BsTrash className="h-4 w-4" />
-                  </button>
+              <div className="flex justify-end gap-2 mt-auto pointer-events-auto">
+                <button
+                  className="btn btn-link btn-xs text-base-content/70 hover:text-primary"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeGeneratedImage(image.id);
+                  }}
+                  aria-label="Delete image"
+                >
+                  <BsTrash className="h-4 w-4" />
+                </button>
 
-                  <button
-                    className="btn btn-circle btn-ghost btn-xs text-white hover:bg-white/20"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openImageModal(image);
-                    }}
-                    aria-label="View image"
-                  >
-                    <BsEye className="h-4 w-4" />
-                  </button>
+                <button
+                  className="btn btn-link btn-xs text-base-content/70 hover:text-primary"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openImageModal(image);
+                  }}
+                  aria-label="View image"
+                >
+                  <BsEye className="h-4 w-4" />
+                </button>
 
-                  <button
-                    className="btn btn-circle btn-ghost btn-xs text-white hover:bg-white/20"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      downloadImage(image.imageUrl, image.prompt);
-                    }}
-                    aria-label="Download image"
-                  >
-                    <BsCloudDownload className="h-4 w-4" />
-                  </button>
-                </div>
+                <button
+                  className="btn btn-link btn-xs text-base-content/70 hover:text-primary"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    downloadImage(image.imageUrl, image.prompt);
+                  }}
+                  aria-label="Download image"
+                >
+                  <BsCloudDownload className="h-4 w-4" />
+                </button>
               </div>
             </div>
           </div>

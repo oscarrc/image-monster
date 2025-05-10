@@ -154,7 +154,7 @@ const GenerationSettings = () => {
                 </div>
 
                 {/* Prioritize Speed */}
-                <div className="form-control">
+                <div className="form-control flex flex-col justify-around">
                   <label className="label cursor-pointer py-1">
                     <span className="label-text">Prioritize Speed</span>
                     <input
@@ -168,7 +168,7 @@ const GenerationSettings = () => {
                       }
                     />
                   </label>
-                  <span className="text-xs text-base-content/70">
+                  <span className="text-xs text-base-content/70 block">
                     May use more memory but improve performance
                   </span>
                 </div>
