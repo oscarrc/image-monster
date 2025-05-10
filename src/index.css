@@ -7,12 +7,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* @layer utilities {
-  .layout-grid {
-    grid-template-rows: 1fr 12fr 1fr;
-  }
-} */
-
 @layer components {
   .layout-grid {
     display: grid;
@@ -31,3 +25,16 @@
 }
 
 @custom-variant hover (&:hover);
+
+@theme {
+  --animate-slide: slide 30s linear infinite;
+}
+
+@keyframes slide {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-200px * 6));
+  }
+}

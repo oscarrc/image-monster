@@ -1,5 +1,5 @@
 import Layout from "@/components/Layout";
-import React from "react";
+import TechStack from "./components/TechStack";
 
 // Config files for generating content
 const featuresConfig = [
@@ -59,33 +59,6 @@ const faqConfig = [
     question: "Is this service free?",
     answer:
       "Yes, Image Monster is completely free to use! If you enjoy the service, you can support the developer through Ko-fi.",
-  },
-];
-
-const techStackConfig = [
-  {
-    name: "React",
-    icon: "⚛️",
-  },
-  {
-    name: "Tailwind CSS",
-    icon: "🌊",
-  },
-  {
-    name: "DaisyUI",
-    icon: "🌼",
-  },
-  {
-    name: "Transformers.js",
-    icon: "🤖",
-  },
-  {
-    name: "WebGPU",
-    icon: "💻",
-  },
-  {
-    name: "Hugging Face",
-    icon: "🤗",
   },
 ];
 
@@ -235,15 +208,7 @@ const LandingPage = () => {
 
       {/* Tech Stack */}
       <div className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-center mb-8">Powered By</h2>
-        <div className="flex flex-wrap justify-center gap-8 max-w-4xl mx-auto">
-          {techStackConfig.map((tech, index) => (
-            <div key={index} className="flex flex-col items-center">
-              <div className="text-5xl mb-2">{tech.icon}</div>
-              <div className="text-lg font-medium">{tech.name}</div>
-            </div>
-          ))}
-        </div>
+        <TechStack />
       </div>
 
       {/* FAQ Section */}
