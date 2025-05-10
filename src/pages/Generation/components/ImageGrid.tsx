@@ -63,7 +63,6 @@ const ImageGrid = () => {
               className="w-full h-full object-cover cursor-pointer"
               onClick={() => openImageModal(image)}
               onKeyDown={(e) => handleKeyPress(e, () => openImageModal(image))}
-              tabIndex={0}
               role="button"
               aria-label="View image"
             />
