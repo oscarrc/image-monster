@@ -1,13 +1,17 @@
 // src/pages/Generation/index.tsx
 
+import { BsCloudDownload } from "react-icons/bs";
 import { CiPlay1 } from "react-icons/ci";
 import GenerationSettings from "./components/GenerationSettings";
 import ImageGrid from "./components/ImageGrid";
 import Input from "./components/Input";
+import JSZip from "jszip";
 import Layout from "@/components/Layout";
 import { MODELS } from "@/types/imageGeneration";
 import { ModelInfo } from "@/components/ModelInfo";
+import { saveAs } from "file-saver";
 import { useImageGeneration } from "../../contexts/ImageGenerationContext/useImageGeneration";
+import { useToast } from "../../contexts/ToastContext/useToast";
 
 const Generation = () => {
   const {
@@ -20,6 +24,7 @@ const Generation = () => {
     updateSelectedModel,
     generateImage,
   } = useImageGeneration();
+  const { addToast } = useToast();
 
   const hasPrompt = !!prompt.trim();
   const hasGeneratedImages = generatedImages.length > 0;
@@ -42,6 +47,55 @@ const Generation = () => {
       </div>
     );
   }
+
+  // Function to download all images as a zip
+  const downloadAllImages = () => {
+    if (generatedImages.length === 0) {
+      addToast("No images to download", "warning");
+      return;
+    }
+
+    // If there's only one image, download it directly
+    if (generatedImages.length === 1) {
+      const image = generatedImages[0];
+      const filename = `image-monster-${image.prompt
+        .slice(0, 20)
+        .replace(/[^a-z0-9]/gi, "-")}.png`;
+
+      fetch(image.imageUrl)
+        .then((response) => response.blob())
+        .then((blob) => {
+          saveAs(blob, filename);
+        });
+      return;
+    }
+
+    // Otherwise create a zip with all images
+    const zip = new JSZip();
+    const promises: Promise<void>[] = [];
+
+    // Add each generated image to the zip
+    generatedImages.forEach((image) => {
+      const promise = fetch(image.imageUrl)
+        .then((response) => response.blob())
+        .then((blob) => {
+          // Create a filename based on the prompt
+          const filename = `image-monster-${image.prompt
+            .slice(0, 20)
+            .replace(/[^a-z0-9]/gi, "-")}.png`;
+          zip.file(filename, blob);
+        });
+
+      promises.push(promise);
+    });
+
+    // When all images are added to the zip, generate and download it
+    Promise.all(promises).then(() => {
+      zip.generateAsync({ type: "blob" }).then((content) => {
+        saveAs(content, "image-monster-generated.zip");
+      });
+    });
+  };
 
   return (
     <Layout>
@@ -102,13 +156,30 @@ const Generation = () => {
           </div>
         )}
 
-        {/* Generate button (similar to process all images) */}
-        {hasPrompt && !isGenerating && (
-          <div
-            className="fixed bottom-15 right-6 z-10"
-            role="group"
-            aria-label="Image generation actions"
-          >
+        {/* Download and Generate buttons */}
+        <div
+          className="fixed bottom-15 right-6 z-10 flex flex-col items-center gap-2"
+          role="group"
+          aria-label="Image generation actions"
+        >
+          {/* Download all button - only show when there are images */}
+          {hasGeneratedImages && !isGenerating && (
+            <button
+              className="btn btn-primary btn-outline btn-md btn-circle shadow-lg"
+              onClick={downloadAllImages}
+              aria-label={`Download ${
+                generatedImages.length === 1
+                  ? "generated image"
+                  : "all generated images as ZIP"
+              }`}
+              tabIndex={0}
+            >
+              <BsCloudDownload className="h-5 w-5" aria-hidden="true" />
+            </button>
+          )}
+
+          {/* Generate button */}
+          {hasPrompt && !isGenerating && (
             <button
               className="btn btn-primary btn-circle btn-lg shadow-lg"
               onClick={() => generateImage()}
@@ -125,8 +196,8 @@ const Generation = () => {
                 <CiPlay1 className="h-6 w-6" aria-hidden="true" />
               )}
             </button>
-          </div>
-        )}
+          )}
+        </div>
 
         {statusMessage}
       </section>

@@ -1,5 +1,3 @@
-// src/pages/Generation/components/GenerationSettings.tsx
-
 import { useImageGeneration } from "../../../contexts/ImageGenerationContext/useImageGeneration";
 
 const GenerationSettings = () => {
@@ -34,7 +32,7 @@ const GenerationSettings = () => {
                 }
                 className="range range-xs range-primary"
               />
-              <div className="label py-0">
+              <div className="label py-0 w-full justify-between">
                 <span className="label-text-alt text-xs">More precise</span>
                 <span className="label-text-alt text-xs">More creative</span>
               </div>
