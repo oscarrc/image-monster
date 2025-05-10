@@ -4,6 +4,7 @@ import Background from "@/pages/Background";
 import Generation from "@/pages/Generation";
 import { ImageGenerationProvider } from "./contexts/ImageGenerationContext/ImageGenerationProvider";
 import { ImageProcessingProvider } from "@/contexts/ImageProcessingContext/ImageProcessingProvider";
+import Landing from "./pages/Landing";
 import { ToastProvider } from "@/contexts/ToastContext/ToastProvider";
 
 const App = () => {
@@ -11,8 +12,9 @@ const App = () => {
     <ToastProvider>
       <BrowserRouter>
         <Routes>
+          <Route path="/" element={<Landing />} />
           <Route
-            path="/"
+            path="/background"
             element={
               <ImageProcessingProvider>
                 <Background />
