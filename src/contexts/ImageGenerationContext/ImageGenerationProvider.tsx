@@ -106,7 +106,7 @@ export const ImageGenerationProvider = ({
 
       // Load the model
       model.current = await MultiModalityCausalLM.from_pretrained(modelId, {
-        dtype: "fp32",
+        dtype: "q4",
         //@ts-expect-error navigator gpu
         device: navigator?.gpu ? "webgpu" : "wasm",
         progress_callback: progressCallback,

@@ -18,8 +18,6 @@ const Generation = () => {
     prompt,
     generatedImages,
     isGenerating,
-    modelLoading,
-    loadingProgress,
     selectedModel,
     updateSelectedModel,
     generateImage,
@@ -29,24 +27,6 @@ const Generation = () => {
   const hasPrompt = !!prompt.trim();
   const hasGeneratedImages = generatedImages.length > 0;
   const shouldCollapse = hasGeneratedImages || isGenerating;
-
-  // Loading or generating state message
-  let statusMessage = null;
-  if (modelLoading) {
-    statusMessage = (
-      <div className="bg-base-200 rounded-box p-3 shadow-md fixed bottom-6 right-6 z-40 flex items-center gap-3">
-        <span className="loading loading-spinner loading-md text-primary"></span>
-        <span>Loading model: {loadingProgress}%</span>
-      </div>
-    );
-  } else if (isGenerating) {
-    statusMessage = (
-      <div className="bg-base-200 rounded-box p-3 shadow-md fixed bottom-6 right-6 z-40 flex items-center gap-3">
-        <span className="loading loading-spinner loading-md text-primary"></span>
-        <span>Generating image...</span>
-      </div>
-    );
-  }
 
   // Function to download all images as a zip
   const downloadAllImages = () => {
@@ -124,8 +104,8 @@ const Generation = () => {
         <div
           className="w-full max-w-3xl mx-auto flex-shrink-0"
           style={{
-            height: hasGeneratedImages ? "10rem" : "15rem",
-            marginBottom: hasGeneratedImages ? "0.5rem" : "0",
+            height: shouldCollapse ? "10rem" : "15rem",
+            marginBottom: shouldCollapse ? "0.5rem" : "0",
           }}
           aria-label="Write your prompt here"
         >
@@ -198,8 +178,6 @@ const Generation = () => {
             </button>
           )}
         </div>
-
-        {statusMessage}
       </section>
     </Layout>
   );

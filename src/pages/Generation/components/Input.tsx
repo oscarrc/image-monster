@@ -33,7 +33,7 @@ const Input = () => {
     <div className="relative w-full h-full">
       <textarea
         ref={textareaRef}
-        className="textarea textarea-bordered border-base-content/70 focus:border-primary focus:outline-none w-full h-full border-4 rounded-xl p-6 transition-all duration-300 ease-in-out resize-none"
+        className="textarea textarea-bordered border-base-content/70 disabled:border-base-content/70 focus:border-primary focus:outline-none w-full h-full border-4 rounded-xl p-6 transition-all duration-300 ease-in-out resize-none"
         placeholder="Type your prompt here..."
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
