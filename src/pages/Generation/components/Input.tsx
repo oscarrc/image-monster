@@ -14,10 +14,6 @@ const Input = () => {
 
     await generateImage();
 
-    // Optionally clear the prompt after generation
-    // setPrompt("");
-
-    // Focus the textarea after submission
     textareaRef.current?.focus();
   };
 
@@ -42,7 +38,7 @@ const Input = () => {
       />
       <button
         className={`absolute bottom-4 right-2 btn btn-link text-primary disabled:text-base-content/70 ${
-          isGenerating ? "opacity-50 cursor-not-allowed" : ""
+          isGenerating ? "cursor-not-allowed" : ""
         }`}
         type="button"
         onClick={handleSubmit}

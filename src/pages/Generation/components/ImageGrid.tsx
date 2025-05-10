@@ -1,5 +1,3 @@
-// src/pages/Generation/components/ImageGrid.tsx
-
 import { BsCloudDownload, BsEye, BsTrash } from "react-icons/bs";
 
 import { GeneratedImage } from "@/types/imageGeneration";
@@ -21,7 +19,7 @@ const ImageGrid = () => {
     e: KeyboardEvent<HTMLImageElement>,
     action: () => void
   ) => {
-    if (e.key === "Enter" || e.key === " ") {
+    if (e.key === "Enter") {
       e.preventDefault();
       action();
     }
@@ -57,10 +55,10 @@ const ImageGrid = () => {
         {generatedImages.map((image) => (
           <div
             key={image.id}
-            className="relative bg-base-200 shadow-md rounded-box overflow-hidden group"
+            className="relative bg-base-200 shadow-md rounded-box overflow-hidden group hover:shadow-lg transition-all duration-300"
           >
             {/* Square aspect ratio container */}
-            <div className="aspect-square">
+            <div className="aspect-square group">
               <img
                 src={image.imageUrl}
                 alt={`Generated from prompt: ${image.prompt}`}
@@ -74,15 +72,14 @@ const ImageGrid = () => {
                 aria-label="View image"
               />
 
-              {/* Overlay with actions on hover */}
-              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
+              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-2 pointer-events-none">
                 <div className="text-white text-xs line-clamp-3 overflow-hidden">
                   {image.prompt}
                 </div>
 
-                <div className="flex justify-end gap-2 mt-auto">
+                <div className="flex justify-end gap-2 mt-auto pointer-events-auto">
                   <button
-                    className="btn btn-circle btn-ghost btn-xs text-white"
+                    className="btn btn-circle btn-ghost btn-xs text-white hover:bg-white/20"
                     onClick={(e) => {
                       e.stopPropagation();
                       removeGeneratedImage(image.id);
@@ -93,7 +90,7 @@ const ImageGrid = () => {
                   </button>
 
                   <button
-                    className="btn btn-circle btn-ghost btn-xs text-white"
+                    className="btn btn-circle btn-ghost btn-xs text-white hover:bg-white/20"
                     onClick={(e) => {
                       e.stopPropagation();
                       openImageModal(image);
@@ -104,7 +101,7 @@ const ImageGrid = () => {
                   </button>
 
                   <button
-                    className="btn btn-circle btn-ghost btn-xs text-white"
+                    className="btn btn-circle btn-ghost btn-xs text-white hover:bg-white/20"
                     onClick={(e) => {
                       e.stopPropagation();
                       downloadImage(image.imageUrl, image.prompt);
@@ -142,7 +139,7 @@ const ImageGrid = () => {
       <Modal
         isOpen={selectedImage !== null}
         onClose={closeImageModal}
-        title={selectedImage ? "Image Details" : ""}
+        title={selectedImage ? selectedImage.prompt : ""}
         size="xl"
       >
         {selectedImage && (
