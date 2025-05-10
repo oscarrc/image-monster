@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { MODELS, ProcessedImage } from "@/types/imageProcessing";
 
 import { BsCloudDownload } from "react-icons/bs";
 import { CiPlay1 } from "react-icons/ci";
@@ -6,7 +6,6 @@ import { ImageList } from "@/pages/Background/components/ImageList";
 import JSZip from "jszip";
 import Layout from "@/components/Layout";
 import { ModelInfo } from "@/components/ModelInfo";
-import { ProcessedImage } from "@/types/imageProcessing";
 import Uploader from "@/pages/Background/components/Uploader";
 import { saveAs } from "file-saver";
 import { useImageProcessing } from "@/contexts/ImageProcessingContext/useImageProcessing";
@@ -75,90 +74,52 @@ const Background = () => {
 
   return (
     <Layout>
-      <div
-        className={`w-full flex flex-col transition-all duration-500 items-center py-2 gap-4 ${
+      <section
+        className={`w-full flex flex-col transition-all duration-500 items-center gap-8 py-8 ${
           !hasImages ? "justify-center h-full" : "justify-start"
         }`}
-        role="main"
         aria-label="Image background removal application"
       >
-        <AnimatePresence>
-          {!hasImages && (
-            <motion.div
-              initial={{ opacity: 0, y: "-1.25rem" }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: "-3rem", height: 0 }}
-              transition={{ duration: 0.5 }}
-              className="text-center space-y-2 mb-1.5"
-            >
-              <h1 className="text-4xl md:text-5xl font-bold">
-                Feed the{" "}
-                <motion.span
-                  className="text-primary font-bold"
-                  animate={{
-                    scale: [1, 1.1, 1],
-                  }}
-                  transition={{
-                    duration: 1.5,
-                    repeat: Infinity,
-                    repeatType: "reverse",
-                  }}
-                >
-                  Monster
-                </motion.span>{" "}
-                an <span className="text-primary">Image</span>
-              </h1>
-              <p className="text-base-content/70 max-w-2xl mx-auto">
-                Upload images and our AI monster will remove their backgrounds.
-                All processing happens directly in your browser!
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {!hasImages && (
+          <div className="max-w-3xl text-center space-y-2 mb-1.5">
+            <h1 className="text-4xl md:text-5xl font-bold">
+              Feed the <span className="text-primary font-bold">Monster</span>{" "}
+              an <span className="text-primary">Image</span>
+            </h1>
+            <p className="text-base-content/70 max-w-2xl mx-auto">
+              Upload images and our AI monster will remove their backgrounds.
+              All processing happens directly in your browser!
+            </p>
+          </div>
+        )}
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{
-            opacity: 1,
+        <div
+          className="w-full max-w-3xl mx-auto flex-shrink-0"
+          style={{
             height: hasImages ? "10rem" : "15rem",
             marginBottom: hasImages ? "0.5rem" : "0",
           }}
-          transition={{ duration: 0.4 }}
-          className="w-full max-w-3xl mx-auto flex-shrink-0"
           aria-label="Image upload area"
         >
           <Uploader />
-        </motion.div>
+        </div>
 
-        <AnimatePresence>
-          {!hasImages && (
-            <motion.div
-              initial={{ opacity: 0, y: "1.25rem" }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <ModelInfo />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {!hasImages && (
+          <div>
+            <ModelInfo models={MODELS} />
+          </div>
+        )}
 
-        <AnimatePresence>
-          {hasImages && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.5 }}
-              className="w-full max-w-3xl flex-grow overflow-hidden bg-base-200 rounded-box"
-              aria-label="Uploaded images list"
-            >
-              <div className="h-full max-h-[calc(100vh-15rem)] overflow-y-auto">
-                <ImageList />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {hasImages && (
+          <div
+            className="w-full max-w-3xl flex-grow overflow-hidden bg-base-200 rounded-box"
+            aria-label="Uploaded images list"
+          >
+            <div className="h-full max-h-[calc(100vh-15rem)] overflow-y-auto">
+              <ImageList />
+            </div>
+          </div>
+        )}
 
         <div
           className="fixed bottom-15 right-6 z-10 flex flex-col items-center gap-2"
@@ -198,7 +159,7 @@ const Background = () => {
             </button>
           )}
         </div>
-      </div>
+      </section>
     </Layout>
   );
 };

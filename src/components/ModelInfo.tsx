@@ -1,7 +1,7 @@
-import { MODELS } from "../types/imageProcessing";
+import { Model } from "@/types/model";
 import { useImageProcessing } from "../contexts/ImageProcessingContext/useImageProcessing";
 
-export const ModelInfo = () => {
+export const ModelInfo = ({ models }: { models: Model[] }) => {
   const { selectedModel, updateSelectedModel } = useImageProcessing();
 
   const handleModelSelect = (modelId: string) => {
@@ -14,7 +14,7 @@ export const ModelInfo = () => {
         Available Models
       </h3>
       <div className="space-y-4">
-        {MODELS.map((model) => {
+        {models.map((model) => {
           const isSelected = selectedModel === model.id;
 
           return (

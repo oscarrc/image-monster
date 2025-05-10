@@ -1,7 +1,6 @@
 import { KeyboardEvent, useRef, useState } from "react";
 
 import { BsCloudUpload } from "react-icons/bs";
-import { motion } from "framer-motion";
 import { useImageProcessing } from "../../../contexts/ImageProcessingContext/useImageProcessing";
 import { useToast } from "../../../contexts/ToastContext/useToast";
 
@@ -97,32 +96,21 @@ const Uploader = () => {
       role="region"
       aria-label="File upload area"
     >
-      <motion.div
-        className="flex flex-col items-center gap-4 cursor-pointer"
-        whileHover={{ scale: 1.05 }}
+      <div
+        className="flex flex-col items-center gap-4 cursor-pointer hover:scale-105 transition-transform duration-200"
         onClick={handleButtonClick}
         onKeyDown={handleKeyDown}
         tabIndex={0}
         role="button"
         aria-label={hasImages ? "Upload more images" : "Upload images"}
       >
-        <motion.div
-          animate={{
-            y: [0, -10, 0],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            repeatType: "reverse",
-          }}
-          aria-hidden="true"
-        >
+        <div className="animate-bounce" aria-hidden="true">
           <BsCloudUpload
             className={`${
               hasImages ? "w-12 h-12" : "w-16 h-16"
             } text-primary transition-all duration-300`}
           />
-        </motion.div>
+        </div>
         <div className="text-center">
           <h3
             className={`${
@@ -149,7 +137,7 @@ const Uploader = () => {
           aria-hidden="true"
           tabIndex={-1}
         />
-      </motion.div>
+      </div>
     </div>
   );
 };
