@@ -1,11 +1,15 @@
+import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 
+import { IoArrowBackOutline } from "react-icons/io5";
 import { PiGithubLogoFill } from "react-icons/pi";
 import { SiKofi } from "react-icons/si";
 import logo from "@/assets/logo.svg";
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
 
   // Track scroll position for header animation
   useEffect(() => {
@@ -37,6 +41,15 @@ const Header = () => {
           </div>
         </div>
         <div className="flex gap-2 flex-none">
+          {!isHomePage && (
+            <Link
+              to="/"
+              className="btn btn-ghost btn-circle"
+              aria-label="Back to home"
+            >
+              <IoArrowBackOutline className="h-5 w-5" />
+            </Link>
+          )}
           <a
             href="https://github.com/oscarrc/image-monster"
             target="_blank"

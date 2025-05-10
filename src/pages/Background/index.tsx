@@ -125,7 +125,7 @@ const Background = () => {
             className="w-full max-w-3xl flex-grow overflow-hidden bg-base-200 rounded-box"
             aria-label="Uploaded images list"
           >
-            <div className="h-full max-h-[calc(100vh-15rem)] overflow-y-auto">
+            <div className="h-full max-h-[calc(100vh-25rem)] overflow-y-auto">
               <ImageList />
             </div>
           </div>
