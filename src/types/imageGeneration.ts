@@ -1,3 +1,5 @@
+// src/types/imageGeneration.ts
+
 import { Model } from "./model";
 
 export interface GeneratedImage {
@@ -9,11 +11,16 @@ export interface GeneratedImage {
 
 export interface GenerationOptions {
   maxNewTokens?: number;
+  minNewTokens?: number;
   doSample?: boolean;
   temperature?: number;
   topK?: number;
   topP?: number;
   repetitionPenalty?: number;
+  
+  // Memory optimization options
+  precision?: "auto" | "high" | "low";
+  prioritizeSpeed?: boolean;
 }
 
 export const DEFAULT_GENERATION_OPTIONS: GenerationOptions = {
@@ -23,6 +30,10 @@ export const DEFAULT_GENERATION_OPTIONS: GenerationOptions = {
   topK: 50,
   topP: 0.95,
   repetitionPenalty: 1.1,
+  
+  // Default memory optimization settings
+  precision: "auto",
+  prioritizeSpeed: false,
 };
 
 export const MODELS: Model[] = [

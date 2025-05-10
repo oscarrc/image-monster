@@ -1,3 +1,5 @@
+// src/pages/Generation/components/GenerationSettings.tsx
+
 import { useImageGeneration } from "../../../contexts/ImageGenerationContext/useImageGeneration";
 
 const GenerationSettings = () => {
@@ -12,6 +14,7 @@ const GenerationSettings = () => {
         </div>
         <div className="collapse-content">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Temperature */}
             <div className="form-control w-full">
               <label className="label py-1">
                 <span className="label-text">Temperature</span>
@@ -38,6 +41,7 @@ const GenerationSettings = () => {
               </div>
             </div>
 
+            {/* Top-P */}
             <div className="form-control w-full">
               <label className="label py-1">
                 <span className="label-text">Top-P</span>
@@ -58,6 +62,7 @@ const GenerationSettings = () => {
               />
             </div>
 
+            {/* Top-K */}
             <div className="form-control w-full">
               <label className="label py-1">
                 <span className="label-text">Top-K</span>
@@ -78,6 +83,7 @@ const GenerationSettings = () => {
               />
             </div>
 
+            {/* Repetition Penalty */}
             <div className="form-control w-full">
               <label className="label py-1">
                 <span className="label-text">Repetition Penalty</span>
@@ -100,6 +106,7 @@ const GenerationSettings = () => {
               />
             </div>
 
+            {/* Random Sampling */}
             <div className="form-control">
               <label className="label cursor-pointer py-1">
                 <span className="label-text">Random Sampling</span>
@@ -114,6 +121,58 @@ const GenerationSettings = () => {
                   }
                 />
               </label>
+            </div>
+
+            {/* Advanced Memory Options Section */}
+            <div className="col-span-1 md:col-span-2 border-t border-base-300 pt-4 mt-2">
+              <h4 className="text-sm font-semibold mb-3">
+                Memory Optimization
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Precision Mode */}
+                <div className="form-control">
+                  <label className="label py-1">
+                    <span className="label-text">Precision</span>
+                  </label>
+                  <select
+                    className="select select-bordered select-sm w-full"
+                    value={generationOptions.precision || "auto"}
+                    onChange={(e) =>
+                      updateGenerationOptions({
+                        precision: e.target.value as "auto" | "high" | "low",
+                      })
+                    }
+                  >
+                    <option value="auto">Auto-detect (recommended)</option>
+                    <option value="high">
+                      High (better quality, more memory)
+                    </option>
+                    <option value="low">
+                      Low (less memory, lower quality)
+                    </option>
+                  </select>
+                </div>
+
+                {/* Prioritize Speed */}
+                <div className="form-control">
+                  <label className="label cursor-pointer py-1">
+                    <span className="label-text">Prioritize Speed</span>
+                    <input
+                      type="checkbox"
+                      className="toggle toggle-primary toggle-sm"
+                      checked={generationOptions.prioritizeSpeed}
+                      onChange={(e) =>
+                        updateGenerationOptions({
+                          prioritizeSpeed: e.target.checked,
+                        })
+                      }
+                    />
+                  </label>
+                  <span className="text-xs text-base-content/70">
+                    May use more memory but improve performance
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

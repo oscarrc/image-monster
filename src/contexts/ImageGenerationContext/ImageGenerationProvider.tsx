@@ -1,20 +1,20 @@
+// src/contexts/ImageGenerationContext/ImageGenerationProvider.tsx
 import {
   AutoProcessor,
   MultiModalityCausalLM,
   PreTrainedModel,
   Processor,
   ProgressInfo,
+  env,
 } from "@huggingface/transformers";
 import {
   DEFAULT_GENERATION_OPTIONS,
   GeneratedImage,
   GenerationOptions,
 } from "@/types/imageGeneration";
-// src/contexts/ImageGenerationContext/ImageGenerationProvider.tsx
 import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 
 import { ImageGenerationContext } from ".";
-import { env } from "@huggingface/transformers";
 import { useToast } from "../ToastContext/useToast";
 
 // Configure transformers.js environment
@@ -50,6 +50,21 @@ export const ImageGenerationProvider = ({
   // References to the model and processor
   const model = useRef<PreTrainedModel | null>(null);
   const processor = useRef<Processor | null>(null);
+
+  // WebGPU feature check function - no classes needed
+  const checkWebGPUSupport = useCallback(async (): Promise<boolean> => {
+    try {
+      // @ts-expect-error navigator.gpu
+      if (!navigator.gpu) return false;
+      // @ts-expect-error navigator.gpu
+      const adapter = await navigator.gpu.requestAdapter();
+      if (!adapter) return false;
+      return adapter.features.has("shader-f16");
+    } catch (e) {
+      console.error("WebGPU feature detection error:", e);
+      return false;
+    }
+  }, []);
 
   // Progress callback for model loading
   const progressCallback = useCallback((p: ProgressInfo) => {
@@ -93,7 +108,7 @@ export const ImageGenerationProvider = ({
     };
   }, [cleanup]);
 
-  // Load model function
+  // Load model function with optimized memory settings
   const loadModel = useCallback(async () => {
     try {
       // Cleanup existing resources before loading new ones
@@ -104,11 +119,60 @@ export const ImageGenerationProvider = ({
 
       const modelId = selectedModel;
 
-      // Load the model
+      // Check WebGPU support
+      const fp16Supported = await checkWebGPUSupport();
+
+      // Set precision based on options or default to auto-detection
+      const precision = generationOptions.precision || "auto";
+      const useFP16 =
+        precision === "auto" ? fp16Supported : precision === "high";
+
+      // Choose between performance and memory efficiency
+      const prioritizeSpeed = generationOptions.prioritizeSpeed || false;
+
+      // Set device types based on available hardware
+      // @ts-expect-error navigator.gpu
+      const deviceType = navigator?.gpu ? "webgpu" : "wasm";
+
+      // Configure dtype options based on precision settings
+      let dtypeConfig;
+
+      if (useFP16) {
+        dtypeConfig = {
+          prepare_inputs_embeds: "q4",
+          language_model: "q4f16",
+          lm_head: "fp16",
+          gen_head: "fp16",
+          gen_img_embeds: "fp16",
+          image_decode: "fp32",
+        };
+      } else {
+        dtypeConfig = {
+          prepare_inputs_embeds: "fp32",
+          language_model: prioritizeSpeed ? "q4" : "q4f16",
+          lm_head: "fp32",
+          gen_head: "fp32",
+          gen_img_embeds: "fp32",
+          image_decode: "fp32",
+        };
+      }
+
+      // Configure device allocation - inputs on CPU, model on GPU when available
+      const deviceConfig = {
+        prepare_inputs_embeds: "wasm", // Always use wasm for inputs
+        language_model: deviceType,
+        lm_head: deviceType,
+        gen_head: deviceType,
+        gen_img_embeds: deviceType,
+        image_decode: deviceType,
+      };
+
+      // Load the model with optimized settings
       model.current = await MultiModalityCausalLM.from_pretrained(modelId, {
-        dtype: "q4",
-        //@ts-expect-error navigator gpu
-        device: navigator?.gpu ? "webgpu" : "wasm",
+        // @ts-expect-error dtypeConfig
+        dtype: dtypeConfig,
+        // @ts-expect-error deviceConfig
+        device: deviceConfig,
         progress_callback: progressCallback,
       });
 
@@ -128,7 +192,14 @@ export const ImageGenerationProvider = ({
       addToast("Failed to load AI model", "error");
       return false;
     }
-  }, [cleanup, progressCallback, selectedModel, addToast]);
+  }, [
+    cleanup,
+    progressCallback,
+    selectedModel,
+    addToast,
+    checkWebGPUSupport,
+    generationOptions,
+  ]);
 
   // Generate image function
   const generateImage = useCallback(
@@ -141,6 +212,7 @@ export const ImageGenerationProvider = ({
       }
 
       setIsGenerating(true);
+      setLoadingProgress(0);
 
       try {
         // Load model if not already loaded
@@ -168,18 +240,22 @@ export const ImageGenerationProvider = ({
         //@ts-expect-error num_image_tokens
         const numImageTokens = processor.current.num_image_tokens;
 
-        // Generate the image
+        // Generate the image with optimized settings
         //@ts-expect-error generate_images
         const outputs = await model.current.generate_images({
           ...inputs,
           min_new_tokens: numImageTokens,
           max_new_tokens: numImageTokens,
-          ...generationOptions,
+          do_sample: generationOptions.doSample,
+          temperature: generationOptions.temperature,
+          top_k: generationOptions.topK,
+          top_p: generationOptions.topP,
+          repetition_penalty: generationOptions.repetitionPenalty,
         });
 
-        // Convert the generated image to a data URL
-        const canvas = outputs[0].toCanvas();
-        const imageUrl = canvas.toDataURL("image/png");
+        // Get the image output and convert it to a URL
+        const blob = await outputs[0].toBlob();
+        const imageUrl = await URL.createObjectURL(blob);
 
         // Create a new generated image record
         const newImage: GeneratedImage = {
@@ -190,7 +266,7 @@ export const ImageGenerationProvider = ({
         };
 
         // Add to the generated images list
-        setGeneratedImages((prev) => [newImage, ...prev]);
+        setGeneratedImages((prev) => [...prev, newImage]);
 
         // Return the image URL
         return imageUrl;
@@ -200,6 +276,7 @@ export const ImageGenerationProvider = ({
         return null;
       } finally {
         setIsGenerating(false);
+        setLoadingProgress(0);
       }
     },
     [prompt, loadModel, generationOptions, addToast]
