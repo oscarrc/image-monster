@@ -79,7 +79,7 @@ const Background = () => {
   };
 
   return (
-    <Layout>
+    <Layout className="container">
       <section
         className={`w-full flex flex-col transition-all duration-500 items-center gap-8 py-8 ${
           !hasImages ? "justify-center h-full" : "justify-start"
