@@ -1,5 +1,4 @@
 import { Options } from "../../../types/imageProcessing";
-import { motion } from "framer-motion";
 
 interface ImageSettingsProps {
   imageId: string;
@@ -17,13 +16,7 @@ export const ImageSettings = ({
   processImage,
 }: ImageSettingsProps) => {
   return (
-    <motion.div
-      initial={{ opacity: 0, height: 0 }}
-      animate={{ opacity: 1, height: "auto" }}
-      exit={{ opacity: 0, height: 0 }}
-      transition={{ duration: 0.3 }}
-      className="list-col-wrap w-full p-4 rounded-lg space-y-4"
-    >
+    <div className="list-col-wrap w-full p-4 rounded-lg space-y-4">
       <div className="flex flex-col gap-4">
         <label className="label cursor-pointer">
           <span className="label-text">Threshold</span>
@@ -151,6 +144,6 @@ export const ImageSettings = ({
       >
         Apply Settings
       </button>
-    </motion.div>
+    </div>
   );
 };

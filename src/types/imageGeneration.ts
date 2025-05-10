@@ -1,5 +1,30 @@
 import { Model } from "./model";
 
+export interface GeneratedImage {
+  id: string;
+  prompt: string;
+  imageUrl: string;
+  createdAt: Date;
+}
+
+export interface GenerationOptions {
+  maxNewTokens?: number;
+  doSample?: boolean;
+  temperature?: number;
+  topK?: number;
+  topP?: number;
+  repetitionPenalty?: number;
+}
+
+export const DEFAULT_GENERATION_OPTIONS: GenerationOptions = {
+  maxNewTokens: 1024, // Will be overridden with processor.num_image_tokens
+  doSample: true,
+  temperature: 0.8,
+  topK: 50,
+  topP: 0.95,
+  repetitionPenalty: 1.1,
+};
+
 export const MODELS: Model[] = [
   {
     id: "onnx-community/Janus-Pro-1B-ONNX",
