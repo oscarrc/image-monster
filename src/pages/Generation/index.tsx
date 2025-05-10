@@ -1,48 +1,126 @@
+// src/pages/Generation/index.tsx
+
+import { CiPlay1 } from "react-icons/ci";
+import GenerationSettings from "./components/GenerationSettings";
+import ImageGrid from "./components/ImageGrid";
 import Input from "./components/Input";
 import Layout from "@/components/Layout";
 import { MODELS } from "@/types/imageGeneration";
 import { ModelInfo } from "@/components/ModelInfo";
+import { useImageGeneration } from "../../contexts/ImageGenerationContext/useImageGeneration";
 
 const Generation = () => {
-  const hasPrompt = false;
+  const {
+    prompt,
+    generatedImages,
+    isGenerating,
+    modelLoading,
+    loadingProgress,
+    generateImage,
+  } = useImageGeneration();
+
+  const hasPrompt = !!prompt.trim();
+  const hasGeneratedImages = generatedImages.length > 0;
+  const shouldCollapse = hasGeneratedImages || isGenerating;
+
+  // Loading or generating state message
+  let statusMessage = null;
+  if (modelLoading) {
+    statusMessage = (
+      <div className="bg-base-200 rounded-box p-3 shadow-md fixed bottom-6 right-6 z-40 flex items-center gap-3">
+        <span className="loading loading-spinner loading-md text-primary"></span>
+        <span>Loading model: {loadingProgress}%</span>
+      </div>
+    );
+  } else if (isGenerating) {
+    statusMessage = (
+      <div className="bg-base-200 rounded-box p-3 shadow-md fixed bottom-6 right-6 z-40 flex items-center gap-3">
+        <span className="loading loading-spinner loading-md text-primary"></span>
+        <span>Generating image...</span>
+      </div>
+    );
+  }
 
   return (
     <Layout>
       <section
         className={`w-full flex flex-col transition-all duration-500 items-center gap-8 py-8 ${
-          !hasPrompt ? "justify-center h-full" : "justify-start"
+          !shouldCollapse ? "justify-center h-full" : "justify-start"
         }`}
         aria-label="Image generation application"
       >
-        {!hasPrompt && (
+        {/* Title section - only show when no images */}
+        {!shouldCollapse && (
           <div className="max-w-3xl text-center space-y-2 mb-1.5">
             <h1 className="text-4xl md:text-5xl font-bold">
               Ask the <span className="text-primary font-bold">Monster</span>{" "}
               for an <span className="text-primary">Image</span>
             </h1>
             <p className="text-base-content/70 max-w-2xl mx-auto">
-              Send a message to the our monster and it will generate an image
-              for you. It runs entirely in the browser, so no data is sent to a
+              Send a message to our monster and it will generate an image for
+              you. It runs entirely in the browser, so no data is sent to a
               server.
             </p>
           </div>
         )}
 
+        {/* Input section - adjusts height based on context */}
         <div
           className="w-full max-w-3xl mx-auto flex-shrink-0"
           style={{
-            height: hasPrompt ? "10rem" : "15rem",
-            marginBottom: hasPrompt ? "0.5rem" : "0",
+            height: hasGeneratedImages ? "10rem" : "15rem",
+            marginBottom: hasGeneratedImages ? "0.5rem" : "0",
           }}
           aria-label="Write your prompt here"
         >
           <Input />
         </div>
-        {!hasPrompt && (
-          <div>
-            <ModelInfo models={MODELS} />
+
+        {/* Options section - always visible */}
+        <div className="flex flex-col gap-4 w-full max-w-3xl mx-auto">
+          <GenerationSettings />
+          {!shouldCollapse && <ModelInfo models={MODELS} />}
+        </div>
+
+        {/* Gallery section - shows when there are images */}
+        {shouldCollapse && (
+          <div
+            className="w-full max-w-3xl flex-grow overflow-hidden bg-base-200 rounded-box"
+            aria-label="Generated images gallery"
+          >
+            <div className="h-full max-h-[calc(100vh-15rem)] overflow-y-auto">
+              <ImageGrid />
+            </div>
           </div>
         )}
+
+        {/* Generate button (similar to process all images) */}
+        {hasPrompt && !isGenerating && (
+          <div
+            className="fixed bottom-15 right-6 z-10"
+            role="group"
+            aria-label="Image generation actions"
+          >
+            <button
+              className="btn btn-primary btn-circle btn-lg shadow-lg"
+              onClick={() => generateImage()}
+              aria-label="Generate image"
+              tabIndex={0}
+              disabled={isGenerating}
+            >
+              {isGenerating ? (
+                <span
+                  className="loading loading-spinner"
+                  aria-hidden="true"
+                ></span>
+              ) : (
+                <CiPlay1 className="h-6 w-6" aria-hidden="true" />
+              )}
+            </button>
+          </div>
+        )}
+
+        {statusMessage}
       </section>
     </Layout>
   );
