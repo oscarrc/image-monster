@@ -24,6 +24,12 @@
   }
 }
 
+@layer utilities {
+  .pause {
+    animation-play-state: paused;
+  }
+}
+
 @custom-variant hover (&:hover);
 
 @theme {
@@ -31,10 +37,10 @@
 }
 
 @keyframes slide {
-  0% {
+  from {
     transform: translateX(0);
   }
-  100% {
-    transform: translateX(calc(-200px * 6));
+  to {
+    transform: translateX(-100%);
   }
 }
