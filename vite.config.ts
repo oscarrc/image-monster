@@ -36,7 +36,7 @@ export default defineConfig({
       manifest: {
         "name": "ImageMonster",
         "short_name": "ImageMonster",
-        "description": "ImageMonster is a tool for removing backgrounds from images using AI models.",
+        "description": "Free, private, browser-based AI background removal tool. Remove backgrounds from images instantly with no upload to servers. Process multiple images, adjust settings, and download transparent PNGs—all powered by advanced AI models running entirely in your browser for maximum privacy and speed.",
         "start_url": "/",
         "icons": [
           {
