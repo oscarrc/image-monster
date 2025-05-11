@@ -1,3 +1,6 @@
+import { MdDevices, MdMoneyOff, MdPrivacyTip } from "react-icons/md";
+
+import { BsGpuCard } from "react-icons/bs";
 import FAQ from "./components/Faq";
 import HowItWorks from "./components/HowItWorks";
 import Layout from "@/components/Layout";
@@ -8,26 +11,26 @@ const featuresConfig = [
   {
     title: "Privacy First",
     value: "100%",
-    description: "All processing stays in your browser",
-    icon: "🔒",
+    description: "No data is sent to the cloud",
+    icon: <MdPrivacyTip className="h-8 w-8 text-primary" />,
   },
   {
     title: "Processing",
-    value: "Fast",
+    value: "Local",
     description: "Hardware-accelerated with WebGPU",
-    icon: "⚡",
+    icon: <BsGpuCard className="h-8 w-8 text-primary" />,
   },
   {
-    title: "Quality",
-    value: "High",
-    description: "Professional-grade AI models",
-    icon: "✨",
+    title: "Compatibility",
+    value: "Full",
+    description: "Phones, tablets, and computers",
+    icon: <MdDevices className="h-8 w-8 text-primary" />,
   },
   {
     title: "Cost",
     value: "Free",
     description: "No subscriptions or hidden fees",
-    icon: "💸",
+    icon: <MdMoneyOff className="h-8 w-8 text-primary" />,
   },
 ];
 
@@ -36,14 +39,13 @@ const LandingPage = () => {
     <Layout>
       {/* Hero Section */}
       <section className="flex flex-col gap-8 items-center justify-center container mx-auto px-4 text-center py-16 min-h-[70vh]">
-        <h1 className="text-5xl md:text-6xl font-bold">
-          Feed the <span className="text-primary">Monster</span> an{" "}
-          <span className="text-primary">Image</span>
+        <h1 className="text-5xl md:text-6xl font-bold max-w-4xl leading-18">
+          Meet <span className="text-primary">Image Monster</span>.Your AI
+          Studio Companion
         </h1>
         <p className="text-xl max-w-3xl mx-auto">
-          Upload images and our AI monster will remove their backgrounds. All
-          processing happens directly in your browser - your images never leave
-          your device!
+          Upload images and our AI monster will remove backgrounds or generate
+          brand new visuals from your text prompts.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <a href="/background" className="btn btn-primary btn-lg">

@@ -53,7 +53,7 @@ const TechStack = () => {
   const allLogos = [...logos, ...logos];
 
   return (
-    <div className="relative overflow-hidden py-4 bg-transparent">
+    <div className="relative overflow-hidden py-4 bg-transparent max-w-screen">
       <div className="flex animate-slide hover:pause">
         {allLogos.map((logo, index) => (
           <div
