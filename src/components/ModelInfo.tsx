@@ -31,11 +31,11 @@ export const ModelInfo = () => {
                 }`}
                 onClick={() => handleModelSelect(model.id)}
               >
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <span>
+                <div className="grid grid-cols-5 items-center gap-4">
+                  <div className="flex items-center gap-2 col-span-4 text-right">
+                    <div className="truncate">
                       {model.name} ({model.creator})
-                    </span>
+                    </div>
                     {isSelected && (
                       <span className="badge badge-sm badge-primary">
                         Selected
@@ -47,7 +47,7 @@ export const ModelInfo = () => {
                       </span>
                     )}
                   </div>
-                  <div className="text-xs text-base-content/70">
+                  <div className="text-xs text-base-content/70 text-right">
                     {model.size}
                   </div>
                 </div>

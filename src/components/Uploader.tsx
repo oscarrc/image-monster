@@ -36,12 +36,6 @@ const Uploader = () => {
       const dataTransfer = new DataTransfer();
       validFiles.forEach((file) => dataTransfer.items.add(file));
       addImages(dataTransfer.files);
-
-      if (validFiles.length === 1) {
-        addToast(`Added ${validFiles[0].name}`, "success");
-      } else {
-        addToast(`Added ${validFiles.length} images`, "success");
-      }
     }
   };
 

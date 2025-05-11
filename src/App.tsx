@@ -4,7 +4,7 @@ import { BsCloudDownload } from "react-icons/bs";
 import { CiPlay1 } from "react-icons/ci";
 import { ImageList } from "./components/ImageList";
 import JSZip from "jszip";
-import Layout from "./components/layout";
+import Layout from "./components/Layout";
 import { ModelInfo } from "./components/ModelInfo";
 import { ProcessedImage } from "./types/imageProcessing";
 import Uploader from "./components/Uploader";
