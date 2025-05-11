@@ -47,15 +47,15 @@ export const MODELS: Model[] = [
   //   description: "BRIA's RMBG-2.0 is a state-of-the-art background removal model that significantly improves upon RMBG-1.4. Trained on carefully selected diverse datasets including general stock images, e-commerce, gaming, and advertising content.",
   //   features: ["Highest accuracy", "Advanced architecture", "Excellent for professional use"]
   // },
-  {
-    id: "onnx-community/BiRefNet-ONNX",
-    name: "BiRefNet",
-    creator: "ONNX Community",
-    size: "~900MB",
-    recommended: false,
-    description: "BiRefNet is a high-resolution dichotomous image segmentation model that uses bilateral reference for advanced background removal.",
-    features: ["Web-optimized", "High-resolution output", "Advanced segmentation"]
-  },
+  // {
+  //   id: "onnx-community/BiRefNet-ONNX",
+  //   name: "BiRefNet",
+  //   creator: "ONNX Community",
+  //   size: "~900MB",
+  //   recommended: false,
+  //   description: "BiRefNet is a high-resolution dichotomous image segmentation model that uses bilateral reference for advanced background removal.",
+  //   features: ["Web-optimized", "High-resolution output", "Advanced segmentation"]
+  // },
   {
     id: "briaai/RMBG-1.4",
     name: "RMBG-1.4",
