@@ -58,7 +58,7 @@ const LandingPage = () => {
       </section>
 
       {/* Feature Stats */}
-      <div className="stats stats-vertical xl:stats-horizontal shadow mx-auto my-16 bg-neutral">
+      <div className="stats stats-vertical md:grid-cols-2 xl:stats-horizontal shadow xl:mx-auto my-16 bg-neutral">
         {featuresConfig.map((feature, index) => (
           <div className="stat" key={index}>
             <div className="stat-figure text-primary">{feature.icon}</div>
