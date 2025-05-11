@@ -16,6 +16,18 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'],          
+          'ui-vendor': ['framer-motion', 'react-icons'],          
+          'transformers': ['@huggingface/transformers'],          
+          'utils': ['jszip', 'file-saver'],
+        },
+      },
+    },
+  },
   plugins: [
     tailwindcss(),
     react(),    

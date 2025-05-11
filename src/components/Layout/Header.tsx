@@ -57,6 +57,7 @@ const Header = () => {
             href="https://github.com/oscarrc/image-monster"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="GitHub repository"
             className="btn btn-ghost btn-circle"
           >
             <PiGithubLogoFill className="h-6 w-6" />
@@ -65,6 +66,7 @@ const Header = () => {
             href="https://ko-fi.com/oscarrc"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="Buy me a coffee"
             className="btn btn-ghost btn-circle"
           >
             <SiKofi className="h-6 w-6" />

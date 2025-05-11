@@ -124,7 +124,7 @@ const Uploader = () => {
           />
         </motion.div>
         <div className="text-center">
-          <h3
+          <h2
             className={`${
               hasImages ? "text-lg" : "text-xl"
             } mb-2 transition-all duration-300`}
@@ -132,7 +132,7 @@ const Uploader = () => {
             {hasImages
               ? "Upload More Images"
               : "Drag & Drop or Click to Upload"}
-          </h3>
+          </h2>
           {!hasImages && (
             <p className="text-base-content/60">
               Support for JPG, PNG, WebP up to 10MB. Multiple files allowed.

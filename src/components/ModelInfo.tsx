@@ -24,7 +24,12 @@ export const ModelInfo = () => {
                 isSelected ? "border-primary" : "border-base-300"
               }`}
             >
-              <input type="radio" defaultChecked={false} name="models" />
+              <input
+                type="radio"
+                defaultChecked={false}
+                name="models"
+                aria-label={`Model ${model.name} details`}
+              />
               <div
                 className={`collapse-title font-medium cursor-pointer ${
                   isSelected ? "text-primary" : ""
