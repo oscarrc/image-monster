@@ -139,7 +139,7 @@ const faqItems = [
           If you enjoy using Image Monster and want to support its development,
           you can make a contribution through Ko-Fi.
         </p>
-        <div className="flex gap-2 mt-2">
+        <div className="flex gap-2 mt-4 w-full justify-end">
           <a
             href="https://ko-fi.com/oscarrc"
             target="_blank"
@@ -230,12 +230,12 @@ const faqItems = [
           <li>Open a new issue for bugs or feature requests</li>
           <li>Reach out through Ko-Fi if you have other questions</li>
         </ul>
-        <div className="flex gap-3 mt-4">
+        <div className="flex gap-4 w-full mt-4 justify-end">
           <a
             href="https://github.com/oscarrc/image-monster/issues"
             target="_blank"
             rel="noopener noreferrer"
-            className="btn btn-sm bg-[#333] hover:bg-[#555] text-white"
+            className="btn btn-sm btn-primary"
           >
             GitHub Issues
           </a>
@@ -243,7 +243,7 @@ const faqItems = [
             href="https://ko-fi.com/oscarrc"
             target="_blank"
             rel="noopener noreferrer"
-            className="btn btn-sm bg-[#FF5E5B] hover:bg-[#FF7A77] text-white"
+            className="btn btn-sm btn-secondary btn-outline"
           >
             Contact via Ko-Fi
           </a>
